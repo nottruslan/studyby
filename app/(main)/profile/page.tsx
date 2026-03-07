@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { ProfileView } from "@/components/profile/ProfileView";
+import { PasswordSection } from "@/components/profile/PasswordSection";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -18,9 +19,10 @@ export default async function ProfilePage() {
   if (!profile) redirect("/profile");
 
   return (
-    <div>
+    <div className="space-y-6">
       <h2 className="mb-4 text-xl font-semibold">Профиль</h2>
       <ProfileView profile={profile} />
+      <PasswordSection />
     </div>
   );
 }

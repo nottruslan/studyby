@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,10 +62,20 @@ export default function OnboardingPage() {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (err) throw err;
+      if (err) {
+        console.error("Supabase signInWithOtp:", err);
+        throw err;
+      }
       setSent(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Ошибка отправки");
+      console.error("Send OTP error:", err);
+      const message =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message: unknown }).message)
+          : err instanceof Error
+            ? err.message
+            : "Ошибка отправки. Проверь .env (NEXT_PUBLIC_SUPABASE_URL и ANON_KEY).";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -101,6 +112,15 @@ export default function OnboardingPage() {
             exit={{ opacity: 0 }}
             className="w-full max-w-md text-center"
           >
+            <p className="mb-6 text-sm text-muted-foreground">
+              Уже есть аккаунт?{" "}
+              <Link
+                href="/login"
+                className="font-medium text-primary underline underline-offset-4 hover:no-underline"
+              >
+                Войти
+              </Link>
+            </p>
             <div className="mb-8 overflow-hidden">
               <motion.div
                 animate={{ x: `-${step * 100}%` }}
@@ -168,7 +188,9 @@ export default function OnboardingPage() {
                   />
                 </div>
                 {error && (
-                  <p className="text-sm text-destructive">{error}</p>
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400" role="alert">
+                    {error}
+                  </p>
                 )}
                 <Button
                   type="submit"
