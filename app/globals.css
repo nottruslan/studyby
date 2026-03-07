@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 238 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 238 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 238 84% 67%;
+    --radius: 1.5rem;
+  }
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 238 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 238 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 238 84% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  .bg-background { background-color: hsl(var(--background)); }
+  .text-foreground { color: hsl(var(--foreground)); }
+  .bg-primary { background-color: hsl(var(--primary)); }
+  .text-primary { color: hsl(var(--primary)); }
+  .bg-secondary { background-color: hsl(var(--secondary)); }
+  .text-muted-foreground { color: hsl(var(--muted-foreground)); }
+  .border-input { border-color: hsl(var(--input)); }
+  .ring-ring { --tw-ring-color: hsl(var(--ring)); }
+  .bg-card { background-color: hsl(var(--card)); }
+  .text-card-foreground { color: hsl(var(--card-foreground)); }
+  .bg-destructive { background-color: hsl(var(--destructive)); }
+  .text-destructive-foreground { color: hsl(var(--destructive-foreground)); }
+  .bg-accent { background-color: hsl(var(--accent)); }
+  .text-accent-foreground { color: hsl(var(--accent-foreground)); }
+  .bg-muted { background-color: hsl(var(--muted)); }
+  .border-border { border-color: hsl(var(--border)); }
+  .bg-popover { background-color: hsl(var(--popover)); }
+  .text-popover-foreground { color: hsl(var(--popover-foreground)); }
+  .ring-offset-background { --tw-ring-offset-color: hsl(var(--background)); }
+}
+
+body {
+  @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+}
+
+/* Clickable scale */
+[data-clickable] {
+  @apply active:scale-95 transition-transform;
+}
