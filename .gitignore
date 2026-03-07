@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Build / env
+dist/
+build/
+.env
+.env.local
+*.log
+
+# Optional: раскомментируй при необходимости
+# .cursor/
