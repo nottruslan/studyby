@@ -16,6 +16,7 @@ env/
 # Build / env
 dist/
 build/
+.next/
 .env
 .env.local
 *.log
