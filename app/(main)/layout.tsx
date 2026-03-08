@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
+import { unstable_noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Header } from "@/components/shared/Header";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNavigationBar } from "@/components/shared/BottomNavigationBar";
@@ -9,6 +11,7 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode;
 }) {
+  unstable_noStore();
   const supabase = await createClient();
   const {
     data: { user },
@@ -25,14 +28,23 @@ export default async function MainLayout({
     .single();
 
   if (!profile) {
-    await supabase.from("profiles").insert({
-      id: user.id,
-      username: user.email?.split("@")[0] ?? "user",
-      avatar_url: null,
-      university: null,
-      balance: 0,
-    });
-    redirect("/profile");
+    const admin = createAdminClient();
+    const { error } = await admin.from("profiles").upsert(
+      {
+        id: user.id,
+        username: user.email?.split("@")[0] ?? "user",
+        email: user.email ?? null,
+        avatar_url: null,
+        university: null,
+        balance: 0,
+      },
+      { onConflict: "id" }
+    );
+    if (error) {
+      console.error("[layout] profiles upsert failed:", error.message);
+      throw new Error("Не удалось создать профиль. Проверьте SUPABASE_SERVICE_ROLE_KEY и RLS.");
+    }
+    redirect("/feed");
   }
 
   return (

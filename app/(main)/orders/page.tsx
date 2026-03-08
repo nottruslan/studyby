@@ -3,77 +3,19 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   ClipboardList,
   Plus,
   Loader2,
+  AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { Order, OrderStatus } from "@/lib/types/order";
+import { StatusBadge, formatOrderDate } from "@/lib/orders/order-display";
 
 const ACTIVE_STATUSES = ["review", "waiting_payment", "in_progress"];
 const HISTORY_STATUSES = ["completed", "cancelled"];
-
-export type OrderStatus =
-  | "review"
-  | "waiting_payment"
-  | "in_progress"
-  | "completed"
-  | "cancelled";
-
-export type Order = {
-  id: string;
-  student_id: string;
-  title: string;
-  subject: string | null;
-  work_type: string | null;
-  deadline: string | null;
-  description: string | null;
-  files: string[] | null;
-  status: OrderStatus;
-  price: number | null;
-  created_at?: string;
-};
-
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  const months = [
-    "января", "февраля", "марта", "апреля", "мая", "июня",
-    "июля", "августа", "сентября", "октября", "ноября", "декабря",
-  ];
-  const day = d.getDate();
-  const month = months[d.getMonth()];
-  const hours = d.getHours().toString().padStart(2, "0");
-  const minutes = d.getMinutes().toString().padStart(2, "0");
-  return `${day} ${month}, ${hours}:${minutes} (МСК)`;
-}
-
-function StatusBadge({ status }: { status: OrderStatus }) {
-  const labels: Record<OrderStatus, string> = {
-    review: "На проверке",
-    waiting_payment: "Ожидает оплаты",
-    in_progress: "В работе",
-    completed: "Выполнен",
-    cancelled: "Отменён",
-  };
-  const style: Record<OrderStatus, string> = {
-    review: "bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    waiting_payment: "bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30",
-    in_progress: "bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 border-indigo-500/30",
-    completed: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",
-    cancelled: "bg-slate-500/20 text-slate-600 dark:text-slate-400 border-slate-500/30",
-  };
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        style[status]
-      )}
-    >
-      {labels[status]}
-    </span>
-  );
-}
 
 function EmptyState({
   icon: Icon,
@@ -102,6 +44,14 @@ export default function OrdersPage() {
   const [tab, setTab] = useState<"active" | "history">("active");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [retryTrigger, setRetryTrigger] = useState(0);
+
+  const handleRetry = () => {
+    setLoadError(false);
+    setLoading(true);
+    setRetryTrigger((t) => t + 1);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -118,12 +68,15 @@ export default function OrdersPage() {
         .from("orders")
         .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at")
         .eq("student_id", user.id)
+        .eq("deleted_by_student", false)
         .order("created_at", { ascending: false });
       if (!mounted) return;
       if (error) {
         setOrders([]);
+        setLoadError(true);
       } else {
         setOrders((data as Order[]) ?? []);
+        setLoadError(false);
       }
       setLoading(false);
     }
@@ -131,7 +84,7 @@ export default function OrdersPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [retryTrigger]);
 
   const activeOrders = orders.filter((o) => ACTIVE_STATUSES.includes(o.status));
   const historyOrders = orders.filter((o) => HISTORY_STATUSES.includes(o.status));
@@ -176,7 +129,26 @@ export default function OrdersPage() {
         </button>
       </div>
 
-      {loading ? (
+      {loadError ? (
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-muted/30 py-16 px-6 text-center">
+          <div className="rounded-full bg-muted p-4 mb-4">
+            <AlertCircle className="h-10 w-10 text-destructive" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">
+            Не удалось загрузить заказы
+          </h3>
+          <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+            Проверьте интернет и попробуйте снова.
+          </p>
+          <Button
+            variant="outline"
+            className="mt-6 rounded-3xl"
+            onClick={handleRetry}
+          >
+            Повторить
+          </Button>
+        </div>
+      ) : loading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -212,7 +184,7 @@ export default function OrdersPage() {
                   </div>
                   {order.deadline && (
                     <p className="text-sm text-muted-foreground">
-                      Срок: {formatDate(order.deadline)}
+                      Срок: {formatOrderDate(order.deadline)}
                     </p>
                   )}
                   {order.status === "waiting_payment" && order.price != null && (
@@ -255,7 +227,7 @@ export default function OrdersPage() {
                 </div>
                 {order.deadline && (
                   <p className="text-sm text-muted-foreground">
-                    Срок: {formatDate(order.deadline)}
+                    Срок: {formatOrderDate(order.deadline)}
                   </p>
                 )}
               </Link>

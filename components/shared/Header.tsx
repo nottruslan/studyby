@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ThemeToggle } from "./ThemeToggle";
 import { ProfileMenu } from "./ProfileMenu";
 
-type Profile = { username: string | null; avatar_url: string | null };
+type Profile = { username: string | null; avatar_url: string | null; role?: string | null };
 
 export function Header({ profile }: { profile?: Profile | null }) {
   return (
@@ -14,7 +14,11 @@ export function Header({ profile }: { profile?: Profile | null }) {
       <div className="flex items-center gap-2">
         <ThemeToggle />
         {profile && (
-          <ProfileMenu username={profile.username} avatarUrl={profile.avatar_url} />
+          <ProfileMenu
+            username={profile.username}
+            avatarUrl={profile.avatar_url}
+            role={profile.role}
+          />
         )}
       </div>
     </header>

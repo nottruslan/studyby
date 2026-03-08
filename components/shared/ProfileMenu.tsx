@@ -9,9 +9,10 @@ import { createClient } from "@/lib/supabase/client";
 type ProfileMenuProps = {
   username: string | null;
   avatarUrl: string | null;
+  role?: string | null;
 };
 
-export function ProfileMenu({ username, avatarUrl }: ProfileMenuProps) {
+export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -62,6 +63,15 @@ export function ProfileMenu({ username, avatarUrl }: ProfileMenuProps) {
           >
             Профиль
           </Link>
+          {role === "admin" && (
+            <Link
+              href="/admin/orders"
+              className="block px-3 py-2 text-sm text-foreground hover:bg-muted"
+              onClick={() => setOpen(false)}
+            >
+              Админка
+            </Link>
+          )}
           <button
             type="button"
             className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-muted"

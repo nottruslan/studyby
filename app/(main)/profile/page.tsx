@@ -15,7 +15,7 @@ export default async function ProfilePage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile) redirect("/profile");
+  if (!profile) redirect("/feed");
 
   return (
     <div className="space-y-2">

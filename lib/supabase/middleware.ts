@@ -62,5 +62,22 @@ export async function updateSession(request: NextRequest) {
     return redirectWithCookies(url, supabaseResponse);
   }
 
+  const isAdminRoute = url.pathname.startsWith("/admin");
+  if (isAdminRoute) {
+    if (!user) {
+      url.pathname = "/onboarding";
+      return redirectWithCookies(url, supabaseResponse);
+    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role !== "admin") {
+      url.pathname = "/403";
+      return redirectWithCookies(url, supabaseResponse);
+    }
+  }
+
   return supabaseResponse;
 }
