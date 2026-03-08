@@ -10,7 +10,7 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -169,16 +169,12 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
         id: "actions",
         header: "Действия",
         cell: ({ row }) => (
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-3xl"
-            asChild
+          <Link
+            href={`/admin/orders/${row.original.id}/edit`}
+            className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-3xl" })}
           >
-            <Link href={`/admin/orders/${row.original.id}/edit`}>
-              Редактировать
-            </Link>
-          </Button>
+            Редактировать
+          </Link>
         ),
       },
     ],
@@ -280,16 +276,12 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
                 <p>Цена: {order.price != null ? `${order.price} ₽` : "—"}</p>
               </CardContent>
               <CardFooter>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full rounded-3xl"
-                  asChild
+                <Link
+                  href={`/admin/orders/${order.id}/edit`}
+                  className={buttonVariants({ variant: "outline", size: "sm", className: "w-full rounded-3xl" })}
                 >
-                  <Link href={`/admin/orders/${order.id}/edit`}>
-                    Редактировать
-                  </Link>
-                </Button>
+                  Редактировать
+                </Link>
               </CardFooter>
             </Card>
           ))
