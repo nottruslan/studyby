@@ -180,6 +180,7 @@ export default function NewOrderPage() {
       <div className="flex items-center gap-2">
         <Link
           href="/orders"
+          prefetch={true}
           className="inline-flex items-center gap-1 rounded-3xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
         >
           <ChevronLeft className="h-5 w-5" />
@@ -206,7 +207,7 @@ export default function NewOrderPage() {
         ))}
       </div>
 
-      <div className="card-style rounded-3xl p-6 space-y-6 border border-slate-200 dark:border-slate-800">
+      <div className="card-style rounded-3xl p-6 pb-32 space-y-6 border border-slate-200 dark:border-slate-800 min-h-0">
         {step === 1 && (
           <>
             <div>

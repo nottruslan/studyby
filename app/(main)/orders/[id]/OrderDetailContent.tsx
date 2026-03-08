@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -20,6 +20,7 @@ type Props = { order: Order };
 
 export function OrderDetailContent({ order }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [fileUrls, setFileUrls] = useState<{ path: string; url: string }[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -77,8 +78,10 @@ export function OrderDetailContent({ order }: Props) {
       return;
     }
     toast.success("Заказ удалён из вашего списка");
-    router.push("/orders");
-    router.refresh();
+    startTransition(() => {
+      router.push("/orders");
+      router.refresh();
+    });
   };
 
   const canEditOrCancel =
@@ -92,6 +95,7 @@ export function OrderDetailContent({ order }: Props) {
       <div className="flex items-center gap-2">
         <Link
           href="/orders"
+          prefetch={true}
           className="inline-flex items-center gap-1 rounded-3xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -226,6 +230,7 @@ export function OrderDetailContent({ order }: Props) {
               <>
                 <Link
                   href={`/orders/${order.id}/edit`}
+                  prefetch={true}
                   className={buttonVariants({ variant: "outline", className: "rounded-3xl" })}
                 >
                   Редактировать
@@ -252,10 +257,12 @@ export function OrderDetailContent({ order }: Props) {
             variant="ghost"
             size="sm"
             onClick={handleDelete}
-            disabled={!!actionLoading}
+            disabled={!!actionLoading || isPending}
             className="rounded-3xl text-muted-foreground hover:text-destructive"
           >
             {actionLoading === "delete" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <>

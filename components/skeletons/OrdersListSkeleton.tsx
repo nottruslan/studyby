@@ -1,10 +1,7 @@
 export function OrdersListSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="h-7 w-40 rounded-2xl bg-muted" />
-        <div className="h-9 w-32 rounded-3xl bg-muted" />
-      </div>
+      <div className="h-7 w-40 rounded-2xl bg-muted" />
       <div className="flex gap-1 rounded-3xl bg-muted p-1 w-48">
         <div className="h-9 flex-1 rounded-3xl bg-background" />
         <div className="h-9 flex-1 rounded-3xl" />

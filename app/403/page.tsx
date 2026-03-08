@@ -8,7 +8,7 @@ export default function ForbiddenPage() {
       <p className="text-center text-muted-foreground">
         У вас нет прав для просмотра этой страницы.
       </p>
-      <Link href="/feed" className={buttonVariants({ className: "rounded-3xl" })}>
+      <Link href="/feed" prefetch={true} className={buttonVariants({ className: "rounded-3xl" })}>
         На главную
       </Link>
     </div>

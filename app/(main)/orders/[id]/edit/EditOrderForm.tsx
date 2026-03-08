@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -16,6 +16,7 @@ type Props = { order: Order; deadlineLocal: string };
 
 export function EditOrderForm({ order, deadlineLocal }: Props) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState(order.title);
   const [subject, setSubject] = useState(order.subject ?? "");
@@ -77,8 +78,10 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
       return;
     }
     toast.success("Заказ обновлён");
-    router.push(`/orders/${order.id}`);
-    router.refresh();
+    startTransition(() => {
+      router.push(`/orders/${order.id}`);
+      router.refresh();
+    });
   }
 
   return (
@@ -249,8 +252,8 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
         )}
       </div>
       <div className="flex gap-2">
-        <Button type="submit" className="rounded-3xl" disabled={loading}>
-          {loading ? (
+        <Button type="submit" className="rounded-3xl" disabled={loading || isPending}>
+          {loading || isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             "Сохранить"

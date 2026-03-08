@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,6 +17,7 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -31,8 +33,10 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
     setOpen(false);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/onboarding");
-    router.refresh();
+    startTransition(() => {
+      router.push("/onboarding");
+      router.refresh();
+    });
   };
 
   return (
@@ -58,6 +62,7 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
           </div>
           <Link
             href="/profile"
+            prefetch={true}
             className="block px-3 py-2 text-sm text-foreground hover:bg-muted"
             onClick={() => setOpen(false)}
           >
@@ -66,6 +71,7 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
           {role === "admin" && (
             <Link
               href="/admin/orders"
+              prefetch={true}
               className="block px-3 py-2 text-sm text-foreground hover:bg-muted"
               onClick={() => setOpen(false)}
             >
@@ -74,10 +80,18 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
           )}
           <button
             type="button"
-            className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-muted"
+            className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-muted disabled:opacity-70"
             onClick={handleLogout}
+            disabled={isPending}
           >
-            Выйти
+            {isPending ? (
+              <span className="inline-flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Выйти
+              </span>
+            ) : (
+              "Выйти"
+            )}
           </button>
         </div>
       )}

@@ -1,7 +1,8 @@
 "use client";
 
+import { useTransition } from "react";
 import { AvatarImageOptimized } from "@/components/ui/avatar-image-optimized";
-import { User, Lock, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
+import { User, Lock, ChevronRight, LogOut, ShieldCheck, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -22,12 +23,15 @@ const rowClass =
 
 export function ProfileView({ profile }: { profile: Profile }) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/onboarding");
-    router.refresh();
+    startTransition(() => {
+      router.push("/onboarding");
+      router.refresh();
+    });
   };
 
   return (
@@ -94,10 +98,11 @@ export function ProfileView({ profile }: { profile: Profile }) {
         <button
           type="button"
           onClick={handleLogout}
-          className={`${rowClass} border-t border-border text-destructive hover:bg-destructive/10`}
+          disabled={isPending}
+          className={`${rowClass} border-t border-border text-destructive hover:bg-destructive/10 disabled:opacity-70`}
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-destructive/15 text-destructive">
-            <LogOut className="h-5 w-5" />
+            {isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <LogOut className="h-5 w-5" />}
           </div>
           <span className="flex-1 font-medium">Выйти из аккаунта</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
