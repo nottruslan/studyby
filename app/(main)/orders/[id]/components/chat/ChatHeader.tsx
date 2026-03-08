@@ -19,6 +19,8 @@ type Props = {
   interlocutorName?: string;
   /** For fullScreen: online status of the interlocutor. */
   interlocutorOnline?: boolean;
+  /** For fullScreen: when set, the center name becomes a link to this href (e.g. admin viewing student profile). */
+  interlocutorProfileHref?: string;
   className?: string;
 };
 
@@ -32,6 +34,7 @@ export function ChatHeader({
   backLabel,
   interlocutorName,
   interlocutorOnline = false,
+  interlocutorProfileHref,
   className,
 }: Props) {
   const studentLabel = studentUsername?.trim() || "Студент";
@@ -64,9 +67,19 @@ export function ChatHeader({
               aria-hidden
             />
           </span>
-          <span className="text-sm font-medium text-foreground truncate text-center">
-            {interlocutorName ?? "Чат"}
-          </span>
+          {interlocutorProfileHref ? (
+            <Link
+              href={interlocutorProfileHref}
+              prefetch={true}
+              className="text-sm font-medium text-foreground truncate text-center hover:underline underline-offset-2"
+            >
+              {interlocutorName ?? "Чат"}
+            </Link>
+          ) : (
+            <span className="text-sm font-medium text-foreground truncate text-center">
+              {interlocutorName ?? "Чат"}
+            </span>
+          )}
         </div>
         <div className="w-[calc(theme(spacing.8)+2rem)] shrink-0" aria-hidden />
       </div>

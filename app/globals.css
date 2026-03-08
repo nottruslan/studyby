@@ -160,9 +160,9 @@ body {
   border-radius: 3px;
 }
 
-/* Плавное изменение высоты чата при выезде/заезде клавиатуры (как в Telegram) */
+/* Плавное изменение позиции и высоты чата при выезде/заезде клавиатуры (как в Telegram) */
 .chat-fullscreen-shell {
-  transition: height 0.25s ease-out;
+  transition: top 0.25s ease-out, height 0.25s ease-out;
 }
 
 @layer utilities {

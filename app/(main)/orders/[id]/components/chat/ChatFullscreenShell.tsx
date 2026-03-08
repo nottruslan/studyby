@@ -3,20 +3,24 @@
 import React, { useEffect, useRef } from "react";
 
 const VVH_VAR = "--chat-vvh";
+const VV_TOP_VAR = "--chat-vv-top";
 
 /**
- * Syncs visual viewport height (keyboard-aware) to CSS variable for smooth
- * chat height changes when the keyboard opens/closes (Telegram-like).
+ * Syncs visual viewport (keyboard-aware) to CSS variables so the chat shell
+ * exactly covers the visible area. Uses both height and offsetTop so the
+ * input bar stays at the bottom of the visible viewport (just above keyboard).
  */
 function useVisualViewportHeight() {
   const rafRef = useRef<number | null>(null);
   const scheduledRef = useRef(false);
 
   useEffect(() => {
-    const setVVH = () => {
+    const setVV = () => {
       const vv = typeof window !== "undefined" ? window.visualViewport : null;
       const h = vv?.height ?? window.innerHeight;
+      const top = vv?.offsetTop ?? 0;
       document.documentElement.style.setProperty(VVH_VAR, `${Math.round(h)}px`);
+      document.documentElement.style.setProperty(VV_TOP_VAR, `${Math.round(top)}px`);
     };
 
     const schedule = () => {
@@ -25,11 +29,11 @@ function useVisualViewportHeight() {
       rafRef.current = requestAnimationFrame(() => {
         scheduledRef.current = false;
         rafRef.current = null;
-        setVVH();
+        setVV();
       });
     };
 
-    setVVH();
+    setVV();
     const vv = window.visualViewport;
     vv?.addEventListener("resize", schedule);
     vv?.addEventListener("scroll", schedule);
@@ -64,8 +68,9 @@ export function ChatFullscreenShell({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden chat-fullscreen-shell"
+      className="fixed left-0 right-0 z-50 flex flex-col bg-background overflow-hidden chat-fullscreen-shell"
       style={{
+        top: "var(--chat-vv-top, 0px)",
         height: "var(--chat-vvh, 100dvh)",
       }}
     >

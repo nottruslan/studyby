@@ -30,6 +30,8 @@ type Props = {
   backHref?: string;
   /** For fullScreen: label for the back button. */
   backLabel?: string;
+  /** Student id (order owner); when set in admin fullScreen, name links to profile. */
+  studentId?: string;
 };
 
 function rowToItem(row: OrderMessageRow): ChatMessageItem {
@@ -54,6 +56,7 @@ export function OrderChatArea({
   fullScreen = false,
   backHref,
   backLabel,
+  studentId,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessageItem[]>(() =>
     initialMessages.map(rowToItem)
@@ -235,6 +238,10 @@ export function OrderChatArea({
     : undefined;
   const interlocutorOnline =
     fullScreen && (isCurrentUserAdmin ? studentOnline : adminOnline);
+  const interlocutorProfileHref =
+    fullScreen && isCurrentUserAdmin && studentId
+      ? `/admin/users/${studentId}`
+      : undefined;
 
   return (
     <div className={cn(containerClass)}>
@@ -248,6 +255,7 @@ export function OrderChatArea({
         backLabel={backLabel}
         interlocutorName={interlocutorName}
         interlocutorOnline={interlocutorOnline}
+        interlocutorProfileHref={interlocutorProfileHref}
       />
       <ChatMessageList
         messages={messages}

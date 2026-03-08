@@ -58,6 +58,7 @@ export default async function AdminOrderChatPage({ params }: Props) {
         fullScreen={true}
         backHref={`/admin/orders/${id}/edit`}
         backLabel="К заказу"
+        studentId={order.student_id}
       />
     </ChatFullscreenShell>
   );
