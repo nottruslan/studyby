@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Order } from "@/lib/types/order";
 import { OrderDetailContent } from "./OrderDetailContent";
+import { getInitialMessages } from "./actions";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -26,5 +27,13 @@ export default async function OrderPage({ params }: Props) {
     notFound();
   }
 
-  return <OrderDetailContent order={order as Order} />;
+  const initialMessages = await getInitialMessages(id);
+
+  return (
+    <OrderDetailContent
+      order={order as Order}
+      currentUserId={user.id}
+      initialChatMessages={initialMessages}
+    />
+  );
 }

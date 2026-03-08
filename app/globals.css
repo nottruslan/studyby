@@ -142,6 +142,21 @@ body {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
+/* Chat message list: thin slate scrollbar, no pull-to-refresh */
+.chat-message-list-scroll {
+  overscroll-behavior-y: none;
+}
+.chat-message-list-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-message-list-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-message-list-scroll::-webkit-scrollbar-thumb {
+  background: hsl(215 20% 65% / 0.5);
+  border-radius: 3px;
+}
+
 @layer utilities {
   /* Стабильная высота экрана в PWA и мобильных — без скачка при скрытии адресной строки */
   .min-h-screen {

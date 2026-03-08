@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Header } from "@/components/shared/Header";
 import { Sidebar } from "@/components/shared/Sidebar";
-import { BottomNavigationBar } from "@/components/shared/BottomNavigationBar";
+import { BottomNavWithChatHide } from "@/components/shared/BottomNavWithChatHide";
 
 export default async function MainLayout({
   children,
@@ -58,9 +58,7 @@ export default async function MainLayout({
           </main>
         </div>
       </div>
-      <div className="lg:hidden flex-shrink-0 border-t border-border bg-background">
-        <BottomNavigationBar />
-      </div>
+      <BottomNavWithChatHide />
     </div>
   );
 }

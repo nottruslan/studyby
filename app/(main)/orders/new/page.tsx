@@ -242,23 +242,26 @@ export default function NewOrderPage() {
               )}
             </div>
             <div>
-              <Label>Тип работы</Label>
-              <select
-                className="mt-1.5 flex h-10 w-full rounded-3xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              <Label htmlFor="work_type">Тип работы</Label>
+              <Select
                 value={selectedWorkType ?? ""}
-                onChange={(e) =>
-                  setValue("work_type", e.target.value as OrderFormValues["work_type"], {
+                onValueChange={(v) =>
+                  setValue("work_type", v as OrderFormValues["work_type"], {
                     shouldValidate: true,
                   })
                 }
               >
-                <option value="">Выберите тип</option>
-                {workTypes.map((w) => (
-                  <option key={w} value={w}>
-                    {w}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="work_type" className="mt-1.5 rounded-3xl">
+                  <SelectValue placeholder="Выберите тип" />
+                </SelectTrigger>
+                <SelectContent>
+                  {workTypes.map((w) => (
+                    <SelectItem key={w} value={w}>
+                      {w}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.work_type && (
                 <p className="mt-1 text-sm text-red-500">
                   {errors.work_type.message}
@@ -311,12 +314,12 @@ export default function NewOrderPage() {
                     )}
                   </div>
                   <div>
-                    <Label>Система проверки</Label>
+                    <Label htmlFor="plagiarism_system">Система проверки</Label>
                     <Select
                       value={watch("plagiarism_system") || ""}
                       onValueChange={(v) => setValue("plagiarism_system", v)}
                     >
-                      <SelectTrigger className="mt-1.5 rounded-3xl">
+                      <SelectTrigger id="plagiarism_system" className="mt-1.5 rounded-3xl">
                         <SelectValue placeholder="Выберите систему" />
                       </SelectTrigger>
                       <SelectContent>
@@ -332,6 +335,8 @@ export default function NewOrderPage() {
                     <Label htmlFor="volume">Объём страниц</Label>
                     <Input
                       id="volume"
+                      type="text"
+                      autoComplete="off"
                       {...register("volume")}
                       placeholder="25–30"
                       className="mt-1.5 rounded-3xl"
@@ -361,6 +366,8 @@ export default function NewOrderPage() {
                     </Label>
                     <Input
                       id="volume-tech"
+                      type="text"
+                      autoComplete="off"
                       {...register("volume")}
                       placeholder="5 задач, 3 вариант"
                       className="mt-1.5 rounded-3xl"

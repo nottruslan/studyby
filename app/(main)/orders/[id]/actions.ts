@@ -248,3 +248,141 @@ export async function updateOrderByStudent(
   revalidatePath("/admin/orders");
   return { success: true };
 }
+
+// --- Order chat ---
+
+export type OrderMessageRow = {
+  id: string;
+  order_id: string;
+  sender_id: string;
+  content: string | null;
+  file_url: string | null;
+  file_type: string | null;
+  created_at: string;
+  is_read: boolean;
+};
+
+export async function getInitialMessages(
+  orderId: string
+): Promise<OrderMessageRow[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("student_id")
+    .eq("id", orderId)
+    .single();
+
+  if (!order) return [];
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+  if (order.student_id !== user.id && !isAdmin) return [];
+
+  const { data: rows } = await supabase
+    .from("order_messages")
+    .select("id, order_id, sender_id, content, file_url, file_type, created_at, is_read")
+    .eq("order_id", orderId)
+    .order("created_at", { ascending: true })
+    .limit(50);
+
+  return (rows ?? []) as OrderMessageRow[];
+}
+
+export async function getOlderMessages(
+  orderId: string,
+  beforeCreatedAt: string
+): Promise<OrderMessageRow[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("student_id")
+    .eq("id", orderId)
+    .single();
+  if (!order) return [];
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+  if (order.student_id !== user.id && !isAdmin) return [];
+
+  const { data: rows } = await supabase
+    .from("order_messages")
+    .select("id, order_id, sender_id, content, file_url, file_type, created_at, is_read")
+    .eq("order_id", orderId)
+    .lt("created_at", beforeCreatedAt)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  const list = (rows ?? []) as OrderMessageRow[];
+  list.reverse();
+  return list;
+}
+
+export type SendOrderMessageResult =
+  | { success: true; messageId: string }
+  | { error: string };
+
+export async function sendOrderMessage(
+  orderId: string,
+  content: string | null,
+  fileUrl: string | null,
+  fileType: string | null
+): Promise<SendOrderMessageResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Не авторизован" };
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("student_id")
+    .eq("id", orderId)
+    .single();
+
+  if (!order) return { error: "Заказ не найден" };
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+  const isAdmin = profile?.role === "admin";
+  if (order.student_id !== user.id && !isAdmin) return { error: "Нет доступа" };
+
+  if (
+    (content == null || content.trim() === "") &&
+    (fileUrl == null || fileUrl.trim() === "")
+  ) {
+    return { error: "Добавьте текст или файл" };
+  }
+
+  const { data: row, error } = await supabase
+    .from("order_messages")
+    .insert({
+      order_id: orderId,
+      sender_id: user.id,
+      content: content?.trim() || null,
+      file_url: fileUrl?.trim() || null,
+      file_type: fileType ?? null,
+    })
+    .select("id")
+    .single();
+
+  if (error) return { error: error.message };
+  return { success: true, messageId: row.id };
+}

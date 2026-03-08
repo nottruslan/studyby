@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronLeft, Loader2, ExternalLink, Trash2 } from "lucide-react";
+import { ChevronLeft, Loader2, ExternalLink, Trash2, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "@/lib/types/order";
 import { StatusBadge, formatOrderDate } from "@/lib/orders/order-display";
@@ -15,10 +15,20 @@ import {
   cancelOrderByStudent,
   deleteOrderByStudent,
 } from "./actions";
+import type { OrderMessageRow } from "./actions";
+import { OrderChatArea } from "./components/chat/OrderChatArea";
 
-type Props = { order: Order };
+type Props = {
+  order: Order;
+  currentUserId: string;
+  initialChatMessages: OrderMessageRow[];
+};
 
-export function OrderDetailContent({ order }: Props) {
+export function OrderDetailContent({
+  order,
+  currentUserId,
+  initialChatMessages,
+}: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [fileUrls, setFileUrls] = useState<{ path: string; url: string }[]>([]);
@@ -90,8 +100,8 @@ export function OrderDetailContent({ order }: Props) {
   const isOverdue =
     order.deadline && new Date(order.deadline) < new Date();
 
-  return (
-    <div className="space-y-6">
+  const orderContent = (
+    <>
       <div className="flex items-center gap-2">
         <Link
           href="/orders"
@@ -272,6 +282,32 @@ export function OrderDetailContent({ order }: Props) {
             )}
           </Button>
         </div>
+      </div>
+
+      {/* Mobile: link to full-screen chat */}
+      <div className="md:hidden">
+        <Link
+          href={`/orders/${order.id}/chat`}
+          prefetch={true}
+          className={buttonVariants({ variant: "outline", className: "rounded-3xl w-full" })}
+        >
+          <MessageCircle className="h-4 w-4 mr-2" />
+          Чат
+        </Link>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_400px] gap-4 md:gap-6 min-h-0">
+      <div className="space-y-6 min-w-0">{orderContent}</div>
+      <div className="hidden md:flex flex-col min-h-0 rounded-3xl border border-border overflow-hidden card-style">
+        <OrderChatArea
+          orderId={order.id}
+          currentUserId={currentUserId}
+          initialMessages={initialChatMessages}
+          fullScreen={false}
+        />
       </div>
     </div>
   );
