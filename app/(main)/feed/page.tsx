@@ -1,14 +1,14 @@
 import { Suspense } from "react";
+import { getFeedPosts } from "./actions";
+import { FeedStudlingShell } from "@/components/feed/FeedStudlingShell";
 import { FeedSkeleton } from "@/components/skeletons/FeedSkeleton";
 
-function FeedContent() {
+const PAGE_SIZE = 5;
+
+async function FeedContent() {
+  const { posts, nextCursor } = await getFeedPosts(null, PAGE_SIZE);
   return (
-    <div>
-      <h2 className="text-xl font-semibold">Лента</h2>
-      <p className="mt-2 text-muted-foreground">
-        Здесь будет лента постов. Пока заглушка.
-      </p>
-    </div>
+    <FeedStudlingShell initialPosts={posts} initialCursor={nextCursor} />
   );
 }
 
