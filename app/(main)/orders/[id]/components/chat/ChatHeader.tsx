@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Circle, ChevronLeft } from "lucide-react";
+import { Circle, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -56,29 +56,46 @@ export function ChatHeader({
           {backLabel ?? "Назад"}
         </Link>
         <div className="flex-1 min-w-0 flex items-center justify-center gap-1.5">
-          <span className="relative flex shrink-0">
-            <Circle
-              className={cn(
-                "h-2.5 w-2.5",
-                interlocutorOnline
-                  ? "fill-emerald-500 text-emerald-500"
-                  : "fill-muted-foreground/50 text-muted-foreground/50"
-              )}
-              aria-hidden
-            />
-          </span>
           {interlocutorProfileHref ? (
             <Link
               href={interlocutorProfileHref}
               prefetch={true}
-              className="text-sm font-medium text-foreground truncate text-center hover:underline underline-offset-2"
+              className="inline-flex items-center gap-1.5 min-w-0 max-w-full rounded-xl px-2 py-1.5 -m-1 text-sm font-medium text-primary hover:bg-accent hover:text-primary/90 active:opacity-80"
+              title="Открыть профиль"
             >
-              {interlocutorName ?? "Чат"}
+              <span className="relative flex shrink-0">
+                <Circle
+                  className={cn(
+                    "h-2.5 w-2.5",
+                    interlocutorOnline
+                      ? "fill-emerald-500 text-emerald-500"
+                      : "fill-muted-foreground/50 text-muted-foreground/50"
+                  )}
+                  aria-hidden
+                />
+              </span>
+              <span className="truncate text-center">
+                {interlocutorName ?? "Студент"}
+              </span>
+              <ChevronRight className="h-4 w-4 shrink-0 opacity-70" aria-hidden />
             </Link>
           ) : (
-            <span className="text-sm font-medium text-foreground truncate text-center">
-              {interlocutorName ?? "Чат"}
-            </span>
+            <>
+              <span className="relative flex shrink-0">
+                <Circle
+                  className={cn(
+                    "h-2.5 w-2.5",
+                    interlocutorOnline
+                      ? "fill-emerald-500 text-emerald-500"
+                      : "fill-muted-foreground/50 text-muted-foreground/50"
+                  )}
+                  aria-hidden
+                />
+              </span>
+              <span className="text-sm font-medium text-foreground truncate text-center">
+                {interlocutorName ?? "Чат"}
+              </span>
+            </>
           )}
         </div>
         <div className="w-[calc(theme(spacing.8)+2rem)] shrink-0" aria-hidden />

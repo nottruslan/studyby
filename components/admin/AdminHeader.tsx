@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -16,10 +16,23 @@ import { adminNavItems } from "./AdminSidebar";
 export function AdminHeader() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const isSubpage =
+    pathname?.match(/^\/admin\/orders\/[^/]+/) ||
+    pathname?.match(/^\/admin\/users\/[^/]+/);
 
   return (
     <header className="hidden lg:flex sticky top-0 z-40 h-14 items-center justify-between border-b border-border bg-background px-4 pt-[env(safe-area-inset-top)] min-h-[calc(3.5rem+env(safe-area-inset-top))] lg:px-6">
       <div className="flex items-center gap-2">
+        {isSubpage ? (
+          <Link
+            href="/admin/orders"
+            prefetch={true}
+            className="flex items-center gap-1 rounded-xl px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            К заказам
+          </Link>
+        ) : null}
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
             <Button

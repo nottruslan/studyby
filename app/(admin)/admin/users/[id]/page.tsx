@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { ChevronLeft } from "lucide-react";
 import { AdminUserProfileView } from "@/components/admin/AdminUserProfileView";
 
 type Props = { params: Promise<{ id: string }> };
@@ -33,16 +31,6 @@ export default async function AdminUserPage({ params }: Props) {
 
   return (
     <div className="flex flex-col min-h-0">
-      <header className="flex-shrink-0 flex items-center gap-2 border-b border-border bg-background px-4 py-3">
-        <Link
-          href="/admin/orders"
-          prefetch={true}
-          className="inline-flex items-center gap-1 rounded-xl px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          К заказам
-        </Link>
-      </header>
       <main className="flex-1 px-4 py-6">
         <div className="mx-auto max-w-md">
           <AdminUserProfileView
