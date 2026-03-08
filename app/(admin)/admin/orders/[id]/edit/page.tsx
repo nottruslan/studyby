@@ -11,7 +11,7 @@ export default async function AdminOrderEditPage({ params }: Props) {
 
   const { data: order, error: orderError } = await admin
     .from("orders")
-    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, deleted_by_student, deleted_by_admin")
+    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, deleted_by_student, deleted_by_admin, originality, plagiarism_system, volume, university, professor")
     .eq("id", id)
     .single();
 

@@ -22,6 +22,15 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
   const [work_type, setWorkType] = useState(order.work_type ?? "");
   const [deadline, setDeadline] = useState(deadlineLocal);
   const [description, setDescription] = useState(order.description ?? "");
+  const [originality, setOriginality] = useState<string>(
+    order.originality != null ? String(order.originality) : ""
+  );
+  const [plagiarismSystem, setPlagiarismSystem] = useState(
+    order.plagiarism_system ?? ""
+  );
+  const [volume, setVolume] = useState(order.volume ?? "");
+  const [university, setUniversity] = useState(order.university ?? "");
+  const [professor, setProfessor] = useState(order.professor ?? "");
   const [keepFilePaths, setKeepFilePaths] = useState<string[]>(
     order.files ?? []
   );
@@ -53,6 +62,11 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
     formData.set("work_type", work_type);
     formData.set("deadline", deadline);
     formData.set("description", description.trim());
+    formData.set("originality", originality.trim());
+    formData.set("plagiarism_system", plagiarismSystem.trim());
+    formData.set("volume", volume.trim());
+    formData.set("university", university.trim());
+    formData.set("professor", professor.trim());
     formData.set("keepFilePaths", JSON.stringify(keepFilePaths));
     newFiles.forEach((f) => formData.append("newFiles", f));
 
@@ -115,6 +129,62 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
           className="mt-1.5 rounded-3xl"
           required
         />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="edit-originality">Оригинальность (%) (необязательно)</Label>
+          <Input
+            id="edit-originality"
+            type="number"
+            min={0}
+            max={100}
+            value={originality}
+            onChange={(e) => setOriginality(e.target.value)}
+            className="mt-1.5 rounded-3xl"
+          />
+        </div>
+        <div>
+          <Label htmlFor="edit-volume">Объём / вариант (необязательно)</Label>
+          <Input
+            id="edit-volume"
+            value={volume}
+            onChange={(e) => setVolume(e.target.value)}
+            className="mt-1.5 rounded-3xl"
+            placeholder="25–30 или 5 задач"
+          />
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="edit-plagiarism">Система проверки (необязательно)</Label>
+        <Input
+          id="edit-plagiarism"
+          value={plagiarismSystem}
+          onChange={(e) => setPlagiarismSystem(e.target.value)}
+          className="mt-1.5 rounded-3xl"
+          placeholder="Антиплагиат.ВУЗ и т.д."
+        />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="edit-university">ВУЗ (необязательно)</Label>
+          <Input
+            id="edit-university"
+            value={university}
+            onChange={(e) => setUniversity(e.target.value)}
+            className="mt-1.5 rounded-3xl"
+            placeholder="МГУ, СПбГУ"
+          />
+        </div>
+        <div>
+          <Label htmlFor="edit-professor">Преподаватель (необязательно)</Label>
+          <Input
+            id="edit-professor"
+            value={professor}
+            onChange={(e) => setProfessor(e.target.value)}
+            className="mt-1.5 rounded-3xl"
+            placeholder="Иванов И. И."
+          />
+        </div>
       </div>
       <div>
         <Label htmlFor="edit-description">Описание (необязательно)</Label>

@@ -7,9 +7,19 @@ import type { OrderStatus } from "@/lib/types/order";
 
 export type UpdateOrderAdminResult = { success: true } | { error: string };
 
+export type UpdateOrderAdminData = {
+  status?: OrderStatus;
+  price?: number | null;
+  originality?: number | null;
+  plagiarism_system?: string | null;
+  volume?: string | null;
+  university?: string | null;
+  professor?: string | null;
+};
+
 export async function updateOrderAdmin(
   orderId: string,
-  data: { status?: OrderStatus; price?: number | null }
+  data: UpdateOrderAdminData
 ): Promise<UpdateOrderAdminResult> {
   const supabase = await createClient();
   const {
@@ -30,9 +40,14 @@ export async function updateOrderAdmin(
   }
 
   const admin = createAdminClient();
-  const updates: { status?: OrderStatus; price?: number | null } = {};
+  const updates: UpdateOrderAdminData = {};
   if (data.status !== undefined) updates.status = data.status;
   if (data.price !== undefined) updates.price = data.price;
+  if (data.originality !== undefined) updates.originality = data.originality;
+  if (data.plagiarism_system !== undefined) updates.plagiarism_system = data.plagiarism_system;
+  if (data.volume !== undefined) updates.volume = data.volume;
+  if (data.university !== undefined) updates.university = data.university;
+  if (data.professor !== undefined) updates.professor = data.professor;
 
   if (Object.keys(updates).length === 0) {
     return { success: true };
@@ -48,6 +63,7 @@ export async function updateOrderAdmin(
   }
 
   revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderId}/edit`);
   return { success: true };
 }
 

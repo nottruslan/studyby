@@ -14,7 +14,7 @@ export async function OrdersData() {
 
   const { data, error } = await supabase
     .from("orders")
-    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at")
+    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, originality, plagiarism_system, volume, university, professor")
     .eq("student_id", user.id)
     .eq("deleted_by_student", false)
     .order("created_at", { ascending: false });

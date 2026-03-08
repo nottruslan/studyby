@@ -21,6 +21,12 @@ export type Order = {
   deleted_by_student?: boolean;
   /** Скрыт из списка админки (мягкое удаление админом) */
   deleted_by_admin?: boolean;
+  // Optional order details (text/tech works, extra context)
+  originality?: number | null;
+  plagiarism_system?: string | null;
+  volume?: string | null;
+  university?: string | null;
+  professor?: string | null;
 };
 
 /** Order with joined profile for admin list */

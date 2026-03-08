@@ -18,7 +18,7 @@ export default async function EditOrderPage({ params }: Props) {
 
   const { data: order, error } = await supabase
     .from("orders")
-    .select("id, student_id, title, subject, work_type, deadline, description, files, status")
+    .select("id, student_id, title, subject, work_type, deadline, description, files, status, originality, plagiarism_system, volume, university, professor")
     .eq("id", id)
     .single();
 

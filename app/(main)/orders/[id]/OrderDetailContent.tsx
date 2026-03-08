@@ -133,6 +133,36 @@ export function OrderDetailContent({ order }: Props) {
               <dd className="whitespace-pre-wrap">{order.description}</dd>
             </div>
           )}
+          {order.originality != null && (
+            <div>
+              <dt className="text-muted-foreground">Оригинальность</dt>
+              <dd>{order.originality}%</dd>
+            </div>
+          )}
+          {order.plagiarism_system && (
+            <div>
+              <dt className="text-muted-foreground">Система проверки</dt>
+              <dd>{order.plagiarism_system}</dd>
+            </div>
+          )}
+          {order.volume && (
+            <div>
+              <dt className="text-muted-foreground">Объём</dt>
+              <dd>{order.volume}</dd>
+            </div>
+          )}
+          {order.university && (
+            <div>
+              <dt className="text-muted-foreground">ВУЗ</dt>
+              <dd>{order.university}</dd>
+            </div>
+          )}
+          {order.professor && (
+            <div>
+              <dt className="text-muted-foreground">Преподаватель</dt>
+              <dd>{order.professor}</dd>
+            </div>
+          )}
         </dl>
 
         <div>

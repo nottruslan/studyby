@@ -1,20 +1,43 @@
 "use client";
 
-import { useState, useCallback, useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useForm, type Resolver } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ChevronLeft, ChevronRight, Upload, X, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { orderFormSchema, workTypes, type OrderFormValues } from "@/lib/validations/order";
+import {
+  orderFormSchema,
+  workTypes,
+  isTextWork,
+  isTechWork,
+  plagiarismSystems,
+  type OrderFormValues,
+} from "@/lib/validations/order";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
   { id: 1, label: "Предмет и тип" },
-  { id: 2, label: "Срок" },
+  { id: 2, label: "Детали и Срок" },
   { id: 3, label: "Описание и файлы" },
 ];
 
@@ -29,80 +52,57 @@ export default function NewOrderPage() {
   const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<Partial<OrderFormValues>>({
-    title: "",
-    subject: "",
-    work_type: undefined,
-    deadline: "",
-    description: "",
-    files: [],
+
+  const form = useForm<OrderFormValues>({
+    resolver: zodResolver(orderFormSchema) as Resolver<OrderFormValues>,
+    defaultValues: {
+      title: "",
+      subject: "",
+      work_type: undefined as OrderFormValues["work_type"] | undefined,
+      deadline: "",
+      description: "",
+      files: [],
+      originality: undefined,
+      plagiarism_system: "",
+      volume: "",
+      university: "",
+      professor: "",
+    },
+    mode: "onChange",
   });
-  const [errors, setErrors] = useState<Partial<Record<keyof OrderFormValues, string>>>({});
 
-  const update = useCallback((patch: Partial<OrderFormValues>) => {
-    setForm((prev) => ({ ...prev, ...patch }));
-    setErrors((prev) => {
-      const next = { ...prev };
-      for (const k of Object.keys(patch) as (keyof OrderFormValues)[]) next[k] = undefined;
-      return next;
-    });
-  }, []);
+  const { register, watch, setValue, trigger, formState: { errors } } = form;
 
-  const validateStep = (s: number): boolean => {
+  const selectedWorkType = watch("work_type");
+  const files = watch("files") ?? [];
+
+  const validateStep = async (s: number): Promise<boolean> => {
     if (s === 1) {
-      const r = orderFormSchema.pick({ title: true, subject: true, work_type: true }).safeParse(form);
-      if (!r.success) {
-        const flat = r.error.flatten().fieldErrors;
-        const e: Partial<Record<keyof OrderFormValues, string>> = {};
-        const t = flat?.title?.[0]; if (t) e.title = t;
-        const sub = flat?.subject?.[0]; if (sub) e.subject = sub;
-        const wt = flat?.work_type?.[0]; if (wt) e.work_type = wt;
-        setErrors((prev) => ({ ...prev, ...e }));
-        return false;
-      }
+      const ok = await trigger(["title", "subject", "work_type"]);
+      if (!ok) toast.error("Заполните поля");
+      return ok;
     }
     if (s === 2) {
-      const r = orderFormSchema.pick({ deadline: true }).safeParse(form);
-      if (!r.success) {
-        const msg = r.error.flatten().fieldErrors?.deadline?.[0] ?? "Укажите срок";
-        setErrors((prev) => ({ ...prev, deadline: msg }));
-        return false;
-      }
+      const ok = await trigger(["deadline"]);
+      if (!ok) toast.error("Укажите срок сдачи");
+      return ok;
     }
     return true;
   };
 
-  const nextStep = () => {
-    if (!validateStep(step)) {
-      toast.error("Заполните поля");
-      return;
-    }
+  const nextStep = async () => {
+    const ok = await validateStep(step);
+    if (!ok) return;
     setStep((s) => Math.min(3, s + 1));
   };
 
-  const handleSubmit = async () => {
-    const parsed = orderFormSchema.safeParse({
-      ...form,
-      deadline: form.deadline || undefined,
-      files: form.files ?? [],
-    });
-    if (!parsed.success) {
-      const flat = parsed.error.flatten().fieldErrors;
-      setErrors({
-        title: flat.title?.[0],
-        subject: flat.subject?.[0],
-        work_type: flat.work_type?.[0],
-        deadline: flat.deadline?.[0],
-        description: flat.description?.[0],
-      });
-      toast.error("Проверьте поля формы");
-      return;
-    }
-    const data = parsed.data;
+  const onSubmit = async (data: OrderFormValues) => {
     setLoading(true);
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         toast.error("Войдите в аккаунт");
         router.push("/onboarding");
@@ -119,6 +119,11 @@ export default function NewOrderPage() {
           description: data.description || null,
           files: [],
           status: "review",
+          originality: data.originality ?? null,
+          plagiarism_system: data.plagiarism_system || null,
+          volume: data.volume || null,
+          university: data.university || null,
+          professor: data.professor || null,
         })
         .select("id")
         .single();
@@ -148,7 +153,8 @@ export default function NewOrderPage() {
         router.refresh();
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Ошибка создания заказа";
+      const msg =
+        err instanceof Error ? err.message : "Ошибка создания заказа";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -158,17 +164,15 @@ export default function NewOrderPage() {
   const addFiles = (list: FileList | null) => {
     if (!list?.length) return;
     const newFiles = Array.from(list);
-    setForm((prev) => ({
-      ...prev,
-      files: [...(prev.files ?? []), ...newFiles],
-    }));
+    setValue("files", [...files, ...newFiles], { shouldValidate: true });
   };
 
   const removeFile = (index: number) => {
-    setForm((prev) => ({
-      ...prev,
-      files: (prev.files ?? []).filter((_, i) => i !== index),
-    }));
+    setValue(
+      "files",
+      files.filter((_, i) => i !== index),
+      { shouldValidate: true }
+    );
   };
 
   return (
@@ -192,7 +196,9 @@ export default function NewOrderPage() {
             onClick={() => setStep(s.id)}
             className={cn(
               "rounded-3xl px-4 py-2 text-sm font-medium transition-colors",
-              step === s.id ? "bg-background text-foreground shadow" : "text-muted-foreground hover:text-foreground"
+              step === s.id
+                ? "bg-background text-foreground shadow"
+                : "text-muted-foreground hover:text-foreground"
             )}
           >
             {s.label}
@@ -200,44 +206,58 @@ export default function NewOrderPage() {
         ))}
       </div>
 
-      <div className="card-style rounded-3xl p-6 space-y-6">
+      <div className="card-style rounded-3xl p-6 space-y-6 border border-slate-200 dark:border-slate-800">
         {step === 1 && (
           <>
             <div>
               <Label htmlFor="title">Название заказа</Label>
               <Input
                 id="title"
-                value={form.title ?? ""}
-                onChange={(e) => update({ title: e.target.value })}
+                {...register("title")}
                 placeholder="Например: Курсовая по матану"
                 className="mt-1.5 rounded-3xl"
               />
-              {errors.title && <p className="mt-1 text-sm text-red-500">{errors.title}</p>}
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="subject">Предмет</Label>
               <Input
                 id="subject"
-                value={form.subject ?? ""}
-                onChange={(e) => update({ subject: e.target.value })}
+                {...register("subject")}
                 placeholder="Например: Математический анализ"
                 className="mt-1.5 rounded-3xl"
               />
-              {errors.subject && <p className="mt-1 text-sm text-red-500">{errors.subject}</p>}
+              {errors.subject && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.subject.message}
+                </p>
+              )}
             </div>
             <div>
               <Label>Тип работы</Label>
               <select
-                value={form.work_type ?? ""}
-                onChange={(e) => update({ work_type: e.target.value as OrderFormValues["work_type"] })}
                 className="mt-1.5 flex h-10 w-full rounded-3xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                value={selectedWorkType ?? ""}
+                onChange={(e) =>
+                  setValue("work_type", e.target.value as OrderFormValues["work_type"], {
+                    shouldValidate: true,
+                  })
+                }
               >
                 <option value="">Выберите тип</option>
                 {workTypes.map((w) => (
-                  <option key={w} value={w}>{w}</option>
+                  <option key={w} value={w}>
+                    {w}
+                  </option>
                 ))}
               </select>
-              {errors.work_type && <p className="mt-1 text-sm text-red-500">{errors.work_type}</p>}
+              {errors.work_type && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.work_type.message}
+                </p>
+              )}
             </div>
             <Button type="button" className="rounded-3xl" onClick={nextStep}>
               Далее <ChevronRight className="h-4 w-4 ml-1" />
@@ -247,20 +267,127 @@ export default function NewOrderPage() {
 
         {step === 2 && (
           <>
+            <AnimatePresence mode="wait">
+              {selectedWorkType && isTextWork(selectedWorkType) && (
+                <motion.div
+                  key="text-works"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-4 overflow-hidden"
+                >
+                  <div>
+                    <Label htmlFor="originality">
+                      Требуемая оригинальность (%)
+                    </Label>
+                    <Input
+                      id="originality"
+                      type="number"
+                      min={0}
+                      max={100}
+                      placeholder="0–100"
+                      className="mt-1.5 rounded-3xl"
+                      {...register("originality", {
+                        setValueAs: (v) =>
+                          v === "" || v == null
+                            ? undefined
+                            : Number.isNaN(Number(v))
+                              ? undefined
+                              : Number(v),
+                      })}
+                    />
+                    {errors.originality && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.originality.message}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label>Система проверки</Label>
+                    <Select
+                      value={watch("plagiarism_system") || ""}
+                      onValueChange={(v) => setValue("plagiarism_system", v)}
+                    >
+                      <SelectTrigger className="mt-1.5 rounded-3xl">
+                        <SelectValue placeholder="Выберите систему" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {plagiarismSystems.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="volume">Объём страниц</Label>
+                    <Input
+                      id="volume"
+                      {...register("volume")}
+                      placeholder="25–30"
+                      className="mt-1.5 rounded-3xl"
+                    />
+                    {errors.volume && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.volume.message}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+              {selectedWorkType && isTechWork(selectedWorkType) && (
+                <motion.div
+                  key="tech-works"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div>
+                    <Label htmlFor="volume-tech">
+                      Объём работы / Вариант
+                    </Label>
+                    <Input
+                      id="volume-tech"
+                      {...register("volume")}
+                      placeholder="5 задач, 3 вариант"
+                      className="mt-1.5 rounded-3xl"
+                    />
+                    {errors.volume && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.volume.message}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div>
               <Label htmlFor="deadline">Срок сдачи</Label>
               <Input
                 id="deadline"
                 type="datetime-local"
                 min={getMinDatetimeLocal()}
-                value={form.deadline ?? ""}
-                onChange={(e) => update({ deadline: e.target.value })}
                 className="mt-1.5 rounded-3xl"
+                {...register("deadline")}
               />
-              {errors.deadline && <p className="mt-1 text-sm text-red-500">{errors.deadline}</p>}
+              {errors.deadline && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.deadline.message}
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="rounded-3xl" onClick={() => setStep(1)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-3xl"
+                onClick={() => setStep(1)}
+              >
                 Назад
               </Button>
               <Button type="button" className="rounded-3xl" onClick={nextStep}>
@@ -276,8 +403,7 @@ export default function NewOrderPage() {
               <Label htmlFor="description">Описание (необязательно)</Label>
               <textarea
                 id="description"
-                value={form.description ?? ""}
-                onChange={(e) => update({ description: e.target.value })}
+                {...register("description")}
                 placeholder="Дополнительные требования, объём страниц и т.д."
                 rows={4}
                 className="mt-1.5 flex w-full rounded-3xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -297,9 +423,9 @@ export default function NewOrderPage() {
                   Перетащите файлы сюда или нажмите для выбора
                 </span>
               </label>
-              {(form.files?.length ?? 0) > 0 && (
+              {files.length > 0 && (
                 <ul className="mt-2 space-y-1">
-                  {(form.files ?? []).map((f, i) => (
+                  {files.map((f, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm">
                       <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
                       <span className="truncate flex-1">{f.name}</span>
@@ -316,17 +442,65 @@ export default function NewOrderPage() {
                 </ul>
               )}
             </div>
+
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="extra" className="border-none">
+                <AccordionTrigger className="rounded-3xl py-2 text-left">
+                  Дополнительные требования (для точной оценки)
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="university">
+                      Ваш ВУЗ (аббревиатура){" "}
+                      <span className="text-muted-foreground font-normal">
+                        (необязательно)
+                      </span>
+                    </Label>
+                    <Input
+                      id="university"
+                      {...register("university")}
+                      placeholder="Например: МГУ, СПбГУ"
+                      className="mt-1.5 rounded-3xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="professor">
+                      ФИО преподавателя{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (необязательно)
+                      </span>
+                    </Label>
+                    <Input
+                      id="professor"
+                      {...register("professor")}
+                      placeholder="Иванов И. И."
+                      className="mt-1.5 rounded-3xl"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
             <div className="flex gap-2">
-              <Button type="button" variant="outline" className="rounded-3xl" onClick={() => setStep(2)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="rounded-3xl"
+                onClick={() => setStep(2)}
+              >
                 Назад
               </Button>
               <Button
                 type="button"
                 className="rounded-3xl"
                 disabled={loading || isPending}
-                onClick={handleSubmit}
+                onClick={form.handleSubmit(onSubmit)}
               >
-                {loading || isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Создать заказ"}
+                {loading || isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Создать заказ"
+                )}
               </Button>
             </div>
           </>

@@ -157,6 +157,25 @@ export function OrderEditSheet({ order, open, onOpenChange, onSuccess }: Props) 
             {order.description && (
               <p><span className="text-muted-foreground">Описание:</span> {order.description}</p>
             )}
+            {order.originality != null && (
+              <p><span className="text-muted-foreground">Оригинальность:</span> {order.originality}%</p>
+            )}
+            {order.plagiarism_system && (
+              <p><span className="text-muted-foreground">Система проверки:</span> {order.plagiarism_system}</p>
+            )}
+            {order.volume && (
+              <p><span className="text-muted-foreground">Объём:</span> {order.volume}</p>
+            )}
+            {(order.university || order.professor) && (
+              <>
+                {order.university && (
+                  <p><span className="text-muted-foreground">ВУЗ:</span> {order.university}</p>
+                )}
+                {order.professor && (
+                  <p><span className="text-muted-foreground">Преподаватель:</span> {order.professor}</p>
+                )}
+              </>
+            )}
           </div>
 
           <div>

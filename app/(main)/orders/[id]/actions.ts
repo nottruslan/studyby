@@ -189,6 +189,18 @@ export async function updateOrderByStudent(
   const work_type = (formData.get("work_type") as string)?.trim();
   const deadline = (formData.get("deadline") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
+  const originalityRaw = (formData.get("originality") as string)?.trim();
+  const originality =
+    originalityRaw === ""
+      ? null
+      : (() => {
+          const n = Number(originalityRaw);
+          return Number.isNaN(n) || n < 0 || n > 100 ? null : n;
+        })();
+  const plagiarism_system = (formData.get("plagiarism_system") as string)?.trim() || null;
+  const volume = (formData.get("volume") as string)?.trim() || null;
+  const university = (formData.get("university") as string)?.trim() || null;
+  const professor = (formData.get("professor") as string)?.trim() || null;
   const keepFilePathsRaw = formData.get("keepFilePaths") as string;
   const keepFilePaths: string[] = keepFilePathsRaw
     ? (JSON.parse(keepFilePathsRaw) as string[])
@@ -222,6 +234,11 @@ export async function updateOrderByStudent(
       deadline: new Date(deadline).toISOString(),
       description,
       files: filePaths,
+      originality,
+      plagiarism_system,
+      volume,
+      university,
+      professor,
     })
     .eq("id", orderId);
 

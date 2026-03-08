@@ -56,6 +56,15 @@ export function AdminOrderEditForm({ order }: Props) {
   const [price, setPrice] = useState<string>(
     order.price != null ? String(order.price) : ""
   );
+  const [originality, setOriginality] = useState<string>(
+    order.originality != null ? String(order.originality) : ""
+  );
+  const [plagiarismSystem, setPlagiarismSystem] = useState<string>(
+    order.plagiarism_system ?? ""
+  );
+  const [volume, setVolume] = useState<string>(order.volume ?? "");
+  const [university, setUniversity] = useState<string>(order.university ?? "");
+  const [professor, setProfessor] = useState<string>(order.professor ?? "");
   const [saving, setSaving] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -65,6 +74,11 @@ export function AdminOrderEditForm({ order }: Props) {
   useEffect(() => {
     setStatus(order.status);
     setPrice(order.price != null ? String(order.price) : "");
+    setOriginality(order.originality != null ? String(order.originality) : "");
+    setPlagiarismSystem(order.plagiarism_system ?? "");
+    setVolume(order.volume ?? "");
+    setUniversity(order.university ?? "");
+    setProfessor(order.professor ?? "");
   }, [order]);
 
   useEffect(() => {
@@ -81,9 +95,29 @@ export function AdminOrderEditForm({ order }: Props) {
       setSaving(false);
       return;
     }
+    const originalityNum =
+      originality.trim() === ""
+        ? null
+        : Number(originality.trim());
+    const hasValidOriginality =
+      originality.trim() === "" ||
+      (!Number.isNaN(originalityNum) &&
+        originalityNum != null &&
+        originalityNum >= 0 &&
+        originalityNum <= 100);
+    if (!hasValidOriginality) {
+      toast.error("Оригинальность: введите число от 0 до 100 или оставьте пустым");
+      setSaving(false);
+      return;
+    }
     const result = await updateOrderAdmin(order.id, {
       status,
       price: priceNum,
+      originality: originality.trim() === "" ? null : originalityNum ?? null,
+      plagiarism_system: plagiarismSystem.trim() || null,
+      volume: volume.trim() || null,
+      university: university.trim() || null,
+      professor: professor.trim() || null,
     });
     setSaving(false);
     if ("error" in result) {
@@ -150,6 +184,29 @@ export function AdminOrderEditForm({ order }: Props) {
           {order.description && (
             <p><span className="text-muted-foreground">Описание:</span> {order.description}</p>
           )}
+          {(order.originality != null || order.plagiarism_system || order.volume) && (
+            <>
+              {order.originality != null && (
+                <p><span className="text-muted-foreground">Оригинальность:</span> {order.originality}%</p>
+              )}
+              {order.plagiarism_system && (
+                <p><span className="text-muted-foreground">Система проверки:</span> {order.plagiarism_system}</p>
+              )}
+              {order.volume && (
+                <p><span className="text-muted-foreground">Объём:</span> {order.volume}</p>
+              )}
+            </>
+          )}
+          {(order.university || order.professor) && (
+            <>
+              {order.university && (
+                <p><span className="text-muted-foreground">ВУЗ:</span> {order.university}</p>
+              )}
+              {order.professor && (
+                <p><span className="text-muted-foreground">Преподаватель:</span> {order.professor}</p>
+              )}
+            </>
+          )}
         </div>
 
         <div>
@@ -205,6 +262,62 @@ export function AdminOrderEditForm({ order }: Props) {
             className="rounded-3xl"
             placeholder="Не указана"
           />
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2 pt-2 border-t border-border">
+          <div className="space-y-2">
+            <Label htmlFor="edit-originality">Оригинальность (%)</Label>
+            <Input
+              id="edit-originality"
+              type="number"
+              min={0}
+              max={100}
+              value={originality}
+              onChange={(e) => setOriginality(e.target.value)}
+              className="rounded-3xl"
+              placeholder="—"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-volume">Объём / вариант</Label>
+            <Input
+              id="edit-volume"
+              value={volume}
+              onChange={(e) => setVolume(e.target.value)}
+              className="rounded-3xl"
+              placeholder="—"
+            />
+          </div>
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="edit-plagiarism">Система проверки</Label>
+            <Input
+              id="edit-plagiarism"
+              value={plagiarismSystem}
+              onChange={(e) => setPlagiarismSystem(e.target.value)}
+              className="rounded-3xl"
+              placeholder="—"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-university">ВУЗ</Label>
+            <Input
+              id="edit-university"
+              value={university}
+              onChange={(e) => setUniversity(e.target.value)}
+              className="rounded-3xl"
+              placeholder="—"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-professor">Преподаватель</Label>
+            <Input
+              id="edit-professor"
+              value={professor}
+              onChange={(e) => setProfessor(e.target.value)}
+              className="rounded-3xl"
+              placeholder="—"
+            />
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-2 pt-2 border-t border-border">

@@ -18,7 +18,7 @@ export default async function OrderPage({ params }: Props) {
 
   const { data: order, error } = await supabase
     .from("orders")
-    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, deleted_by_student")
+    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, deleted_by_student, originality, plagiarism_system, volume, university, professor")
     .eq("id", id)
     .single();
 
