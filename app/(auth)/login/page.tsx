@@ -151,7 +151,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <p className="text-center text-sm text-muted-foreground">
-                Проверь почту и введи 6-значный код из письма.
+                Проверь почту и введи 8-значный код из письма.
               </p>
               <div>
                 <Label htmlFor="login-code">Код из письма</Label>
@@ -159,8 +159,8 @@ export default function LoginPage() {
                   id="login-code"
                   type="text"
                   inputMode="numeric"
-                  maxLength={6}
-                  placeholder="000000"
+                  maxLength={8}
+                  placeholder="00000000"
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                   className="mt-2 rounded-3xl text-center text-lg tracking-widest"
@@ -174,7 +174,7 @@ export default function LoginPage() {
               <Button
                 type="submit"
                 className="w-full rounded-3xl"
-                disabled={loading || code.length !== 6}
+                disabled={loading || code.length !== 8}
               >
                 {loading ? "Проверка…" : "Подтвердить"}
               </Button>

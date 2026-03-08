@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
+import { checkEmailExists } from "./actions";
 
 const SLIDES = [
   {
@@ -27,32 +28,63 @@ const SLIDES = [
   },
   {
     title: "Начни прямо сейчас",
-    text: "Войди по почте — без пароля. Мы отправим тебе ссылку или код.",
+    text: "Войди или зарегистрируйся справа — без пароля.",
   },
 ];
 
+type AuthTab = "login" | "register";
+
 export default function OnboardingPage() {
   const [step, setStep] = useState(0);
-  const [showLogin, setShowLogin] = useState(false);
+  const [tab, setTab] = useState<AuthTab>("register");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailAlreadyRegistered, setEmailAlreadyRegistered] = useState(false);
 
-  const isLastSlide = step === SLIDES.length - 1;
+  const resetFormState = () => {
+    setError(null);
+    setEmailAlreadyRegistered(false);
+  };
 
-  const handleNext = () => {
-    if (isLastSlide) {
-      setShowLogin(true);
-    } else {
-      setStep((s) => s + 1);
+  const handleRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    resetFormState();
+    setLoading(true);
+    try {
+      const exists = await checkEmailExists(email.trim());
+      if (exists) {
+        setEmailAlreadyRegistered(true);
+        setLoading(false);
+        return;
+      }
+      const supabase = createClient();
+      const { error: err } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (err) throw err;
+      setSent(true);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message: unknown }).message)
+          : err instanceof Error
+            ? err.message
+            : "Ошибка отправки.";
+      setError(message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    resetFormState();
     setLoading(true);
     try {
       const supabase = createClient();
@@ -62,20 +94,16 @@ export default function OnboardingPage() {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
-      if (err) {
-        console.error("Supabase signInWithOtp:", err);
-        throw err;
-      }
+      if (err) throw err;
       setSent(true);
     } catch (err: unknown) {
-      console.error("Send OTP error:", err);
-      const message =
+      setError(
         err && typeof err === "object" && "message" in err
           ? String((err as { message: unknown }).message)
           : err instanceof Error
             ? err.message
-            : "Ошибка отправки. Проверь .env (NEXT_PUBLIC_SUPABASE_URL и ANON_KEY).";
-      setError(message);
+            : "Ошибка отправки."
+      );
     } finally {
       setLoading(false);
     }
@@ -102,139 +130,214 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-6">
-      <AnimatePresence mode="wait">
-        {!showLogin ? (
-          <motion.div
-            key="slider"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="w-full max-w-md text-center"
-          >
-            <p className="mb-6 text-sm text-muted-foreground">
-              Уже есть аккаунт?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-primary underline underline-offset-4 hover:no-underline"
-              >
-                Войти
-              </Link>
-            </p>
-            <div className="mb-8 overflow-hidden">
-              <motion.div
-                animate={{ x: `-${step * 100}%` }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="flex"
-              >
-                {SLIDES.map((slide, i) => (
-                  <div
-                    key={i}
-                    className="min-w-full shrink-0 px-2"
-                  >
-                    <h2 className="mb-4 text-2xl font-bold">{slide.title}</h2>
-                    <p className="text-muted-foreground">{slide.text}</p>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            <div className="mb-4 flex justify-center gap-1">
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Левая колонка — слайды */}
+      <section className="flex-1 flex flex-col justify-center px-6 py-10 lg:py-16 lg:pl-16 lg:pr-12 border-b lg:border-b-0 lg:border-r border-border/50">
+        <div className="w-full max-w-md mx-auto lg:max-w-lg">
+          <div className="overflow-hidden">
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25 }}
+              className="min-w-full"
+            >
+              <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
+                {SLIDES[step].title}
+              </h2>
+              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">
+                {SLIDES[step].text}
+              </p>
+            </motion.div>
+          </div>
+          <div className="flex items-center gap-3 mt-8">
+            <div className="flex gap-1.5">
               {SLIDES.map((_, i) => (
                 <button
                   key={i}
                   type="button"
                   aria-label={`Слайд ${i + 1}`}
-                  className={`h-2 w-2 rounded-full transition-colors active:scale-95 ${
-                    i === step ? "bg-primary" : "bg-muted"
+                  className={`h-2 rounded-full transition-all ${
+                    i === step
+                      ? "bg-primary w-6"
+                      : "bg-muted w-2 hover:bg-muted-foreground/30"
                   }`}
                   onClick={() => setStep(i)}
                 />
               ))}
             </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => setStep((s) => Math.max(0, s - 1))}
+                disabled={step === 0}
+              >
+                Назад
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                className="rounded-full"
+                onClick={() => setStep((s) => Math.min(SLIDES.length - 1, s + 1))}
+                disabled={step === SLIDES.length - 1}
+              >
+                Далее
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <Button
-              className="w-full rounded-3xl"
-              onClick={handleNext}
-              size="lg"
+      {/* Правая колонка — вход и регистрация */}
+      <section className="flex-1 flex flex-col justify-center px-6 py-10 lg:py-16 lg:pr-16 lg:pl-12 bg-muted/30">
+        <div className="w-full max-w-sm mx-auto">
+          <div className="flex gap-1 p-1 rounded-3xl bg-muted mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                setTab("register");
+                resetFormState();
+              }}
+              className={`flex-1 py-2.5 rounded-3xl text-sm font-medium transition-colors ${
+                tab === "register"
+                  ? "bg-background text-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {isLastSlide ? "Начать" : "Далее"}
-            </Button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="login"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="w-full max-w-md"
-          >
-            <h2 className="mb-6 text-center text-xl font-semibold">
-              Вход по почте
-            </h2>
+              Регистрация
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTab("login");
+                resetFormState();
+              }}
+              className={`flex-1 py-2.5 rounded-3xl text-sm font-medium transition-colors ${
+                tab === "login"
+                  ? "bg-background text-foreground shadow"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Вход
+            </button>
+          </div>
 
-            {!sent ? (
-              <form onSubmit={handleSendOtp} className="space-y-4">
+          {!sent ? (
+            <form
+              onSubmit={tab === "register" ? handleRegisterSubmit : handleLoginSubmit}
+              className="space-y-4"
+            >
+              <div>
+                <Label htmlFor="auth-email">Email</Label>
+                <Input
+                  id="auth-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="mt-1.5 rounded-3xl"
+                />
+              </div>
+              {emailAlreadyRegistered && (
+                <p className="text-sm text-amber-600 dark:text-amber-400" role="alert">
+                  Такая почта уже зарегистрирована.{" "}
+                  <Link href="/login" className="underline hover:no-underline">
+                    Войдите через неё
+                  </Link>
+                </p>
+              )}
+              {error && (
+                <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+                  {error}
+                </p>
+              )}
+              <Button
+                type="submit"
+                className="w-full rounded-3xl"
+                disabled={loading}
+              >
+                {loading
+                  ? "Отправка…"
+                  : tab === "register"
+                    ? "Зарегистрироваться"
+                    : "Отправить код"}
+              </Button>
+            </form>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Проверь почту. Введи 8-значный код из письма.
+              </p>
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="auth-code">Код</Label>
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="mt-2"
+                    id="auth-code"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={8}
+                    placeholder="00000000"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+                    className="mt-1.5 text-center text-lg tracking-widest rounded-3xl"
                   />
                 </div>
                 {error && (
-                  <p className="text-sm font-medium text-red-600 dark:text-red-400" role="alert">
-                    {error}
-                  </p>
+                  <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
                 )}
                 <Button
                   type="submit"
                   className="w-full rounded-3xl"
-                  disabled={loading}
+                  disabled={loading || code.length !== 8}
                 >
-                  {loading ? "Отправка…" : "Отправить ссылку или код"}
+                  {loading ? "Проверка…" : "Подтвердить"}
                 </Button>
               </form>
+              <button
+                type="button"
+                onClick={() => {
+                  setSent(false);
+                  setCode("");
+                  setError(null);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Ввести другой email
+              </button>
+            </div>
+          )}
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            {tab === "register" ? (
+              <>
+                Уже есть аккаунт?{" "}
+                <button
+                  type="button"
+                  onClick={() => setTab("login")}
+                  className="font-medium text-primary underline underline-offset-4 hover:no-underline"
+                >
+                  Войдите
+                </button>
+              </>
             ) : (
               <>
-                <p className="mb-4 text-center text-sm text-muted-foreground">
-                  Проверь почту. Перейди по ссылке или введи 6-значный код ниже.
-                </p>
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  <div>
-                    <Label htmlFor="code">Код из письма</Label>
-                    <Input
-                      id="code"
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={6}
-                      placeholder="000000"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
-                      className="mt-2 text-center text-lg tracking-widest"
-                    />
-                  </div>
-                  {error && (
-                    <p className="text-sm text-destructive">{error}</p>
-                  )}
-                  <Button
-                    type="submit"
-                    className="w-full rounded-3xl"
-                    disabled={loading || code.length !== 6}
-                  >
-                    {loading ? "Проверка…" : "Подтвердить"}
-                  </Button>
-                </form>
+                Нет аккаунта?{" "}
+                <button
+                  type="button"
+                  onClick={() => setTab("register")}
+                  className="font-medium text-primary underline underline-offset-4 hover:no-underline"
+                >
+                  Зарегистрируйтесь
+                </button>
               </>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
