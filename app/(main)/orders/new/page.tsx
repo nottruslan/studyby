@@ -34,6 +34,7 @@ import {
   type OrderFormValues,
 } from "@/lib/validations/order";
 import { cn } from "@/lib/utils";
+import { revalidateOrdersAndAdmin } from "../actions";
 
 const STEPS = [
   { id: 1, label: "Предмет и тип" },
@@ -147,6 +148,7 @@ export default function NewOrderPage() {
             .eq("id", orderId);
         }
       }
+      await revalidateOrdersAndAdmin();
       toast.success("Заказ создан и отправлен на проверку");
       startTransition(() => {
         router.push("/orders");

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   flexRender,
   getCoreRowModel,
@@ -10,7 +11,7 @@ import {
   type SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants, Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -27,7 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EyeOff, MessageCircle } from "lucide-react";
+import { EyeOff, MessageCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OrderWithStudent, OrderStatus } from "@/lib/types/order";
 
@@ -93,11 +94,19 @@ function StatusBadge({ status }: { status: OrderStatus }) {
 
 type Props = { orders: OrderWithStudent[] };
 
+const AUTO_REFRESH_MS = 15_000;
+
 export function AdminOrdersView({ orders: initialOrders }: Props) {
+  const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sorting, setSorting] = useState<SortingState>([
     { id: "created_at", desc: true },
   ]);
+
+  useEffect(() => {
+    const id = setInterval(() => router.refresh(), AUTO_REFRESH_MS);
+    return () => clearInterval(id);
+  }, [router]);
 
   const filtered = useMemo(() => {
     let list = initialOrders;
@@ -232,6 +241,15 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-3xl"
+          onClick={() => router.refresh()}
+        >
+          <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+          Обновить
+        </Button>
       </div>
 
       {/* Desktop: table */}
