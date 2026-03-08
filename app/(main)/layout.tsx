@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Header } from "@/components/shared/Header";
+import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNavigationBar } from "@/components/shared/BottomNavigationBar";
 
 export default async function MainLayout({
@@ -35,10 +36,17 @@ export default async function MainLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))]">
-      <Header />
-      <main className="px-4 pt-4">{children}</main>
-      <BottomNavigationBar />
+    <div className="main-app-shell min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
+      <Sidebar />
+      <div className="lg:pl-56">
+        <Header profile={profile} />
+        <main className="px-4 pt-4 lg:px-6 lg:pt-6">
+          <div className="lg:mx-auto lg:max-w-4xl">{children}</div>
+        </main>
+      </div>
+      <div className="lg:hidden">
+        <BottomNavigationBar />
+      </div>
     </div>
   );
 }

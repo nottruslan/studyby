@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
+import { DisplayModeScript } from "@/components/shared/DisplayModeScript";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -29,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <head>
+        <DisplayModeScript />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="theme-color" content="#6366f1" />

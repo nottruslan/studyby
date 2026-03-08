@@ -2,30 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutDashboard,
-  Search,
-  ShoppingBag,
-  User,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const items = [
-  { href: "/feed", icon: LayoutDashboard, label: "Лента" },
-  { href: "/search", icon: Search, label: "Поиск" },
-  { href: "/orders", icon: ShoppingBag, label: "Заказы" },
-  { href: "/profile", icon: User, label: "Профиль" },
-];
+import { navItems } from "@/lib/nav-items";
 
 export function BottomNavigationBar() {
   const pathname = usePathname();
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+      className="app-bottom-nav fixed left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background py-2 bottom-0"
       role="navigation"
     >
-      {items.map(({ href, icon: Icon, label }) => {
+      {navItems.map(({ href, icon: Icon, label }) => {
         const isActive = href === "/profile" ? pathname.startsWith("/profile") : pathname === href;
         return (
           <Link

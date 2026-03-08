@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
-import { checkEmailExists } from "./actions";
 
 const SLIDES = [
   {
@@ -48,12 +47,6 @@ export default function OnboardingPage() {
     resetFormState();
     setLoading(true);
     try {
-      const exists = await checkEmailExists(email.trim());
-      if (exists) {
-        setTab("login");
-        setLoading(false);
-        return;
-      }
       const supabase = createClient();
       const { error: err } = await supabase.auth.signInWithOtp({
         email: email.trim(),
