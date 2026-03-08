@@ -26,6 +26,10 @@ type Props = {
   isCurrentUserAdmin?: boolean;
   /** True when rendered on the full-screen chat route (mobile); use h-[100dvh] and hide split. */
   fullScreen?: boolean;
+  /** For fullScreen: link for the back button (e.g. to order). */
+  backHref?: string;
+  /** For fullScreen: label for the back button. */
+  backLabel?: string;
 };
 
 function rowToItem(row: OrderMessageRow): ChatMessageItem {
@@ -48,6 +52,8 @@ export function OrderChatArea({
   studentUsername,
   isCurrentUserAdmin = false,
   fullScreen = false,
+  backHref,
+  backLabel,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessageItem[]>(() =>
     initialMessages.map(rowToItem)
@@ -56,8 +62,10 @@ export function OrderChatArea({
   const [hasOlder, setHasOlder] = useState(initialMessages.length >= 50);
   const [adminOnline, setAdminOnline] = useState(false);
   const [studentOnline, setStudentOnline] = useState(false);
+  const [newMessageIds, setNewMessageIds] = useState<Set<string>>(() => new Set());
   const shouldScrollToBottomRef = useRef(true);
   const scrollToBottomOnNextMessageRef = useRef(false);
+  const newMessageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const setScrollToBottomOnNextMessage = useCallback((v: boolean) => {
     scrollToBottomOnNextMessageRef.current = v;
@@ -95,6 +103,12 @@ export function OrderChatArea({
             next.push(rowToItem(newRow));
             return next;
           });
+          setNewMessageIds((prev) => new Set(prev).add(newRow.id));
+          if (newMessageTimeoutRef.current) clearTimeout(newMessageTimeoutRef.current);
+          newMessageTimeoutRef.current = setTimeout(() => {
+            setNewMessageIds(new Set());
+            newMessageTimeoutRef.current = null;
+          }, 400);
           if (newRow.sender_id !== currentUserId) {
             scrollToBottomOnNextMessageRef.current = true;
           }
@@ -103,6 +117,7 @@ export function OrderChatArea({
       .subscribe();
 
     return () => {
+      if (newMessageTimeoutRef.current) clearTimeout(newMessageTimeoutRef.current);
       supabase.removeChannel(channel);
     };
   }, [orderId, currentUserId]);
@@ -215,6 +230,12 @@ export function OrderChatArea({
     ? "h-full flex flex-col w-full bg-background min-h-0"
     : "h-[calc(100vh-80px)] flex flex-col min-h-0";
 
+  const interlocutorName = fullScreen
+    ? (isCurrentUserAdmin ? (studentUsername?.trim() || "Студент") : "Studby")
+    : undefined;
+  const interlocutorOnline =
+    fullScreen && (isCurrentUserAdmin ? studentOnline : adminOnline);
+
   return (
     <div className={cn(containerClass)}>
       <ChatHeader
@@ -222,6 +243,11 @@ export function OrderChatArea({
         adminOnline={adminOnline}
         studentOnline={studentOnline}
         isCurrentUserStudent={!isCurrentUserAdmin}
+        fullScreen={fullScreen}
+        backHref={backHref}
+        backLabel={backLabel}
+        interlocutorName={interlocutorName}
+        interlocutorOnline={interlocutorOnline}
       />
       <ChatMessageList
         messages={messages}
@@ -233,6 +259,7 @@ export function OrderChatArea({
         shouldScrollToBottomRef={shouldScrollToBottomRef}
         setScrollToBottomOnNextMessage={setScrollToBottomOnNextMessage}
         scrollToBottomOnNextMessageRef={scrollToBottomOnNextMessageRef}
+        newMessageIds={newMessageIds}
       />
       <ChatInputArea
         orderId={orderId}

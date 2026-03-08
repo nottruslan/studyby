@@ -23,12 +23,15 @@ type Props = {
   message: ChatMessageItem;
   isCurrentUser: boolean;
   onRetry?: (tempId: string) => void;
+  /** When true, play entrance animation (realtime message). */
+  isNewMessage?: boolean;
 };
 
 function ChatMessageBubbleComponent({
   message,
   isCurrentUser,
   onRetry,
+  isNewMessage = false,
 }: Props) {
   const isFailed = isOptimisticMessage(message) && message.sendFailed;
   const showRetry =
@@ -38,7 +41,9 @@ function ChatMessageBubbleComponent({
     <div
       className={cn(
         "flex flex-col gap-0.5 px-2 py-1",
-        isCurrentUser ? "items-end" : "items-start"
+        isCurrentUser ? "items-end" : "items-start",
+        isNewMessage &&
+          "animate-in fade-in slide-in-from-bottom-2 duration-200"
       )}
     >
       <div

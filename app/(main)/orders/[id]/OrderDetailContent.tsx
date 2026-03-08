@@ -272,30 +272,29 @@ export function OrderDetailContent({
           </div>
         )}
 
-      </div>
-
-      {/* Удалить из моих заказов — внизу, красный текст без кнопки */}
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={!!actionLoading || isPending}
-          className="text-sm text-destructive hover:underline disabled:opacity-50 disabled:no-underline"
-        >
-          {actionLoading === "delete" ? (
-            <span className="inline-flex items-center gap-1">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Загрузка…
-            </span>
-          ) : isPending ? (
-            <span className="inline-flex items-center gap-1">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Загрузка…
-            </span>
-          ) : (
-            "Удалить из моих заказов"
-          )}
-        </button>
+        {/* Удалить из моих заказов — под кнопками, по центру, красный текст */}
+        <div className="flex justify-center pt-2 border-t border-border">
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={!!actionLoading || isPending}
+            className="text-sm text-destructive hover:underline disabled:opacity-50 disabled:no-underline"
+          >
+            {actionLoading === "delete" ? (
+              <span className="inline-flex items-center gap-1">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Загрузка…
+              </span>
+            ) : isPending ? (
+              <span className="inline-flex items-center gap-1">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Загрузка…
+              </span>
+            ) : (
+              "Удалить из моих заказов"
+            )}
+          </button>
+        </div>
       </div>
     </>
   );

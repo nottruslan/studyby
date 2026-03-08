@@ -2,8 +2,6 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getInitialMessages } from "@/app/(main)/orders/[id]/actions";
 import { OrderChatArea } from "@/app/(main)/orders/[id]/components/chat/OrderChatArea";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -49,18 +47,8 @@ export default async function AdminOrderChatPage({ params }: Props) {
   const studentUsername = studentProfile?.username ?? null;
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-background">
-      <header className="flex-shrink-0 flex items-center gap-2 border-b border-border px-4 py-3">
-        <Link
-          href={`/admin/orders/${id}/edit`}
-          prefetch={true}
-          className="inline-flex items-center gap-1 rounded-3xl px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
-        >
-          <ChevronLeft className="h-5 w-5" />
-          К заказу
-        </Link>
-      </header>
-      <div className="flex-1 min-h-0">
+    <div className="flex flex-col h-[100dvh] w-full bg-background pt-[env(safe-area-inset-top)]">
+      <div className="flex-1 min-h-0 flex flex-col">
         <OrderChatArea
           orderId={id}
           currentUserId={user.id}
@@ -68,6 +56,8 @@ export default async function AdminOrderChatPage({ params }: Props) {
           studentUsername={studentUsername}
           isCurrentUserAdmin={true}
           fullScreen={true}
+          backHref={`/admin/orders/${id}/edit`}
+          backLabel="К заказу"
         />
       </div>
     </div>

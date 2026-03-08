@@ -24,6 +24,8 @@ type Props = {
   scrollToBottomOnNextMessageRef: React.MutableRefObject<boolean>;
   /** Optional class for the scroll container. */
   className?: string;
+  /** Ids of messages that just arrived (realtime) for entrance animation. */
+  newMessageIds?: Set<string>;
 };
 
 export function ChatMessageList({
@@ -37,6 +39,7 @@ export function ChatMessageList({
   setScrollToBottomOnNextMessage,
   scrollToBottomOnNextMessageRef,
   className,
+  newMessageIds,
 }: Props) {
   const listRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -109,6 +112,10 @@ export function ChatMessageList({
             message={msg}
             isCurrentUser={msg.sender_id === currentUserId}
             onRetry={onRetry}
+            isNewMessage={
+              !isOptimisticMessage(msg) &&
+              (newMessageIds?.has(msg.id) ?? false)
+            }
           />
         ))}
       </div>
