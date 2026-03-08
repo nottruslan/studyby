@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   flexRender,
   getCoreRowModel,
@@ -28,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import type { OrderWithStudent, OrderStatus } from "@/lib/types/order";
-import { OrderEditSheet } from "./OrderEditSheet";
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "all", label: "Все" },
@@ -97,7 +97,6 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "created_at", desc: true },
   ]);
-  const [editingOrder, setEditingOrder] = useState<OrderWithStudent | null>(null);
 
   const filtered = useMemo(() => {
     let list = initialOrders;
@@ -174,9 +173,11 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
             variant="outline"
             size="sm"
             className="rounded-3xl"
-            onClick={() => setEditingOrder(row.original)}
+            asChild
           >
-            Редактировать
+            <Link href={`/admin/orders/${row.original.id}/edit`}>
+              Редактировать
+            </Link>
           </Button>
         ),
       },
@@ -192,10 +193,6 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
   });
-
-  const handleClose = () => {
-    setEditingOrder(null);
-  };
 
   return (
     <div className="space-y-4">
@@ -287,24 +284,17 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
                   variant="outline"
                   size="sm"
                   className="w-full rounded-3xl"
-                  onClick={() => setEditingOrder(order)}
+                  asChild
                 >
-                  Редактировать
+                  <Link href={`/admin/orders/${order.id}/edit`}>
+                    Редактировать
+                  </Link>
                 </Button>
               </CardFooter>
             </Card>
           ))
         )}
       </div>
-
-      {editingOrder && (
-        <OrderEditSheet
-          order={editingOrder}
-          open={!!editingOrder}
-          onOpenChange={(open) => !open && setEditingOrder(null)}
-          onSuccess={handleClose}
-        />
-      )}
     </div>
   );
 }
