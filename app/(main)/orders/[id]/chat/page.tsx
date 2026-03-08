@@ -33,6 +33,9 @@ export default async function OrderChatPage({ params }: Props) {
   const isAdmin = profile?.role === "admin";
   if (order.student_id !== user.id && !isAdmin) notFound();
 
+  const isOrderOwner = order.student_id === user.id;
+  const isCurrentUserAdmin = !isOrderOwner && isAdmin;
+
   const initialMessages = await getInitialMessages(id);
 
   const { data: studentProfile } = await supabase
@@ -50,7 +53,7 @@ export default async function OrderChatPage({ params }: Props) {
         currentUserId={user.id}
         initialMessages={initialMessages}
         studentUsername={studentUsername}
-        isCurrentUserAdmin={isAdmin}
+        isCurrentUserAdmin={isCurrentUserAdmin}
         fullScreen={true}
         backHref={`/orders/${id}`}
         backLabel="К заказу"
