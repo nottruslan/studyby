@@ -47,8 +47,8 @@ export default async function AdminOrderChatPage({ params }: Props) {
   const studentUsername = studentProfile?.username ?? null;
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-background pt-[env(safe-area-inset-top)]">
-      <div className="flex-1 min-h-0 flex flex-col">
+    <div className="flex flex-col h-[100dvh] w-full bg-background pt-[env(safe-area-inset-top)] overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <OrderChatArea
           orderId={id}
           currentUserId={user.id}

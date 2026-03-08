@@ -227,8 +227,8 @@ export function OrderChatArea({
   }, [orderId, messages]);
 
   const containerClass = fullScreen
-    ? "h-full flex flex-col w-full bg-background min-h-0"
-    : "h-[calc(100vh-80px)] flex flex-col min-h-0";
+    ? "h-full flex flex-col w-full bg-background min-h-0 overflow-hidden"
+    : "h-[calc(100vh-80px)] flex flex-col min-h-0 overflow-hidden";
 
   const interlocutorName = fullScreen
     ? (isCurrentUserAdmin ? (studentUsername?.trim() || "Студент") : "Studby")

@@ -121,7 +121,7 @@ export function ChatInputArea({
     (text.trim().length > 0 || pendingFiles.length > 0) && !disabled && !sending;
 
   const inputWrapperClass = fullScreen
-    ? "sticky bottom-0 left-0 right-0 border-t border-border bg-background p-3 pb-[env(safe-area-inset-bottom,16px)]"
+    ? "flex-shrink-0 border-t border-border bg-background p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
     : "flex-shrink-0 border-t border-border bg-background p-3";
 
   return (
