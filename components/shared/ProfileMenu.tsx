@@ -36,7 +36,7 @@ export function ProfileMenu({ username, avatarUrl, role }: ProfileMenuProps) {
   };
 
   return (
-    <div className="relative hidden lg:block" ref={ref}>
+    <div className="relative" ref={ref}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

@@ -68,7 +68,7 @@ export function OrderDetailContent({ order }: Props) {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Удалить заказ из списка? В админке он по-прежнему будет виден.")) return;
+    if (!confirm("Удалить заказ из списка?")) return;
     setActionLoading("delete");
     const result = await deleteOrderByStudent(order.id);
     setActionLoading(null);

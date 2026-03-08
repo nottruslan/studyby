@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Lock, ChevronRight, LogOut } from "lucide-react";
+import { User, Lock, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ export type Profile = {
   avatar_url: string | null;
   university: string | null;
   balance: number;
+  role?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -67,6 +68,18 @@ export function ProfileView({ profile }: { profile: Profile }) {
           <span className="flex-1 font-medium">Конфиденциальность</span>
           <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
         </Link>
+        {profile.role === "admin" && (
+          <Link
+            href="/admin/orders"
+            className={`${rowClass} border-t border-border`}
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <span className="flex-1 font-medium">Админка</span>
+            <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+          </Link>
+        )}
         <button
           type="button"
           onClick={handleLogout}
