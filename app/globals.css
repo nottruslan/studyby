@@ -160,6 +160,11 @@ body {
   border-radius: 3px;
 }
 
+/* Плавное изменение высоты чата при выезде/заезде клавиатуры (как в Telegram) */
+.chat-fullscreen-shell {
+  transition: height 0.25s ease-out;
+}
+
 @layer utilities {
   /* Стабильная высота экрана в PWA и мобильных — без скачка при скрытии адресной строки */
   .min-h-screen {

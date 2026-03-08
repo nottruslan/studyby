@@ -11,6 +11,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: "cover",
+  // Плавное поднятие контента при открытии клавиатуры (как в Telegram)
+  interactiveWidget: "resizes-content",
 };
 
 export const metadata: Metadata = {
