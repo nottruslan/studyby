@@ -1,13 +1,13 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getInitialMessages } from "../actions";
-import { OrderChatArea } from "../components/chat/OrderChatArea";
+import { getInitialMessages } from "@/app/(main)/orders/[id]/actions";
+import { OrderChatArea } from "@/app/(main)/orders/[id]/components/chat/OrderChatArea";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
 type Props = { params: Promise<{ id: string }> };
 
-export default async function OrderChatPage({ params }: Props) {
+export default async function AdminOrderChatPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
   const {
@@ -18,21 +18,25 @@ export default async function OrderChatPage({ params }: Props) {
     notFound();
   }
 
-  const { data: order, error } = await supabase
-    .from("orders")
-    .select("id, student_id")
-    .eq("id", id)
-    .single();
-
-  if (error || !order) notFound();
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
     .eq("id", user.id)
     .single();
-  const isAdmin = profile?.role === "admin";
-  if (order.student_id !== user.id && !isAdmin) notFound();
+
+  if (profile?.role !== "admin") {
+    notFound();
+  }
+
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select("id, student_id, deleted_by_admin")
+    .eq("id", id)
+    .single();
+
+  if (error || !order || order.deleted_by_admin) {
+    notFound();
+  }
 
   const initialMessages = await getInitialMessages(id);
 
@@ -48,7 +52,7 @@ export default async function OrderChatPage({ params }: Props) {
     <div className="flex flex-col h-[100dvh] w-full bg-background">
       <header className="flex-shrink-0 flex items-center gap-2 border-b border-border px-4 py-3">
         <Link
-          href={`/orders/${id}`}
+          href={`/admin/orders/${id}/edit`}
           prefetch={true}
           className="inline-flex items-center gap-1 rounded-3xl px-2 py-1.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
         >
@@ -62,7 +66,7 @@ export default async function OrderChatPage({ params }: Props) {
           currentUserId={user.id}
           initialMessages={initialMessages}
           studentUsername={studentUsername}
-          isCurrentUserAdmin={isAdmin}
+          isCurrentUserAdmin={true}
           fullScreen={true}
         />
       </div>

@@ -1,8 +1,10 @@
+import { unstable_noStore } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { Order } from "@/lib/types/order";
 import { OrdersListClient } from "./OrdersListClient";
 
 export async function OrdersData() {
+  unstable_noStore();
   const supabase = await createClient();
   const {
     data: { user },

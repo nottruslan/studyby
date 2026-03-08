@@ -11,6 +11,7 @@ import {
 } from "../../actions";
 import { ChatMessageList } from "./ChatMessageList";
 import { ChatInputArea } from "./ChatInputArea";
+import { ChatHeader } from "./ChatHeader";
 import type { ChatMessageItem, OptimisticMessage } from "./types";
 import { isOptimisticMessage } from "./types";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,10 @@ type Props = {
   orderId: string;
   currentUserId: string;
   initialMessages: OrderMessageRow[];
+  /** Student's profile username (order owner). */
+  studentUsername: string | null;
+  /** True when the current user is an admin (Studby). */
+  isCurrentUserAdmin?: boolean;
   /** True when rendered on the full-screen chat route (mobile); use h-[100dvh] and hide split. */
   fullScreen?: boolean;
 };
@@ -40,6 +45,8 @@ export function OrderChatArea({
   orderId,
   currentUserId,
   initialMessages,
+  studentUsername,
+  isCurrentUserAdmin = false,
   fullScreen = false,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessageItem[]>(() =>
@@ -47,6 +54,8 @@ export function OrderChatArea({
   );
   const [isLoadingOlder, setIsLoadingOlder] = useState(false);
   const [hasOlder, setHasOlder] = useState(initialMessages.length >= 50);
+  const [adminOnline, setAdminOnline] = useState(false);
+  const [studentOnline, setStudentOnline] = useState(false);
   const shouldScrollToBottomRef = useRef(true);
   const scrollToBottomOnNextMessageRef = useRef(false);
 
@@ -97,6 +106,42 @@ export function OrderChatArea({
       supabase.removeChannel(channel);
     };
   }, [orderId, currentUserId]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    const presenceChannel = supabase.channel(`order-presence:${orderId}`, {
+      config: { presence: { key: currentUserId } },
+    });
+
+    presenceChannel
+      .on("presence", { event: "sync" }, () => {
+        const state = presenceChannel.presenceState();
+        let admin = false;
+        let student = false;
+        Object.values(state).forEach((presences) => {
+          (presences as { role?: string }[]).forEach((p) => {
+            if (p.role === "admin") admin = true;
+            if (p.role === "student") student = true;
+          });
+        });
+        setAdminOnline(admin);
+        setStudentOnline(student);
+      })
+      .subscribe(async (status) => {
+        if (status === "SUBSCRIBED") {
+          await presenceChannel.track({
+            user_id: currentUserId,
+            role: isCurrentUserAdmin ? "admin" : "student",
+          });
+        }
+      });
+
+    return () => {
+      presenceChannel.untrack().then(() => {
+        supabase.removeChannel(presenceChannel);
+      });
+    };
+  }, [orderId, currentUserId, isCurrentUserAdmin]);
 
   const handleSend = useCallback(
     async (content: string | null, fileUrl: string | null, fileType: string | null) => {
@@ -172,6 +217,12 @@ export function OrderChatArea({
 
   return (
     <div className={cn(containerClass)}>
+      <ChatHeader
+        studentUsername={studentUsername}
+        adminOnline={adminOnline}
+        studentOnline={studentOnline}
+        isCurrentUserStudent={!isCurrentUserAdmin}
+      />
       <ChatMessageList
         messages={messages}
         currentUserId={currentUserId}

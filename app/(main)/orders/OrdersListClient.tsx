@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,16 @@ type Props = { orders: Order[]; loadError: boolean };
 export function OrdersListClient({ orders, loadError }: Props) {
   const router = useRouter();
   const [tab, setTab] = useState<"active" | "history">("active");
+
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        router.refresh();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+  }, [router]);
 
   const handleRetry = () => {
     revalidateOrders().then(() => router.refresh());

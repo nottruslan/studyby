@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { OrdersData } from "./OrdersData";
 import { OrdersListSkeleton } from "@/components/skeletons/OrdersListSkeleton";
 
+export const dynamic = "force-dynamic";
+
 export default function OrdersPage() {
   return (
     <div className="space-y-6">

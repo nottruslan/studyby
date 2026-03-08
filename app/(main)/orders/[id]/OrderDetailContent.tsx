@@ -22,12 +22,14 @@ type Props = {
   order: Order;
   currentUserId: string;
   initialChatMessages: OrderMessageRow[];
+  studentUsername: string | null;
 };
 
 export function OrderDetailContent({
   order,
   currentUserId,
   initialChatMessages,
+  studentUsername,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -306,6 +308,8 @@ export function OrderDetailContent({
           orderId={order.id}
           currentUserId={currentUserId}
           initialMessages={initialChatMessages}
+          studentUsername={studentUsername}
+          isCurrentUserAdmin={false}
           fullScreen={false}
         />
       </div>

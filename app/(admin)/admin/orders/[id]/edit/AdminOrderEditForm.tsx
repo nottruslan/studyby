@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, ExternalLink, Trash2, EyeOff } from "lucide-react";
+import { ChevronLeft, Loader2, ExternalLink, Trash2, EyeOff, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -161,7 +161,7 @@ export function AdminOrderEditForm({ order }: Props) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Link
           href="/admin/orders"
           prefetch={true}
@@ -169,6 +169,14 @@ export function AdminOrderEditForm({ order }: Props) {
         >
           <ChevronLeft className="h-5 w-5" />
           Назад к заказам
+        </Link>
+        <Link
+          href={`/admin/orders/${order.id}/chat`}
+          prefetch={true}
+          className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-3xl" })}
+        >
+          <MessageCircle className="h-4 w-4 mr-1.5" />
+          Чат
         </Link>
       </div>
 

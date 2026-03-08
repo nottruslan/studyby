@@ -29,11 +29,20 @@ export default async function OrderPage({ params }: Props) {
 
   const initialMessages = await getInitialMessages(id);
 
+  const { data: studentProfile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", order.student_id)
+    .single();
+
+  const studentUsername = studentProfile?.username ?? null;
+
   return (
     <OrderDetailContent
       order={order as Order}
       currentUserId={user.id}
       initialChatMessages={initialMessages}
+      studentUsername={studentUsername}
     />
   );
 }
