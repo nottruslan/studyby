@@ -195,18 +195,18 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
         id: "actions",
         header: "Действия",
         cell: ({ row }) => (
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/admin/orders/${row.original.id}/edit`}
-              className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-3xl" })}
+              className={buttonVariants({ variant: "outline", className: "rounded-3xl" })}
             >
               Редактировать
             </Link>
             <Link
               href={`/admin/orders/${row.original.id}/chat`}
-              className={buttonVariants({ variant: "outline", size: "sm", className: "rounded-3xl" })}
+              className={buttonVariants({ variant: "outline", className: "rounded-3xl inline-flex items-center gap-2" })}
             >
-              <MessageCircle className="h-3.5 w-3.5 mr-1" />
+              <MessageCircle className="h-4 w-4" />
               Чат
             </Link>
           </div>
@@ -333,15 +333,15 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
               <CardFooter className="flex flex-col gap-2 sm:flex-row">
                 <Link
                   href={`/admin/orders/${order.id}/edit`}
-                  className={buttonVariants({ variant: "outline", size: "sm", className: "flex-1 rounded-3xl" })}
+                  className={buttonVariants({ variant: "outline", className: "flex-1 rounded-3xl justify-center" })}
                 >
                   Редактировать
                 </Link>
                 <Link
                   href={`/admin/orders/${order.id}/chat`}
-                  className={buttonVariants({ variant: "outline", size: "sm", className: "flex-1 rounded-3xl" })}
+                  className={buttonVariants({ variant: "outline", className: "flex-1 rounded-3xl justify-center inline-flex items-center gap-2" })}
                 >
-                  <MessageCircle className="h-3.5 w-3.5 mr-1 inline" />
+                  <MessageCircle className="h-4 w-4" />
                   Чат
                 </Link>
               </CardFooter>

@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ChevronLeft, Loader2, ExternalLink, Trash2, MessageCircle } from "lucide-react";
+import { ChevronLeft, Loader2, ExternalLink, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { Order } from "@/lib/types/order";
 import { StatusBadge, formatOrderDate } from "@/lib/orders/order-display";
@@ -104,7 +104,7 @@ export function OrderDetailContent({
 
   const orderContent = (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between gap-2">
         <Link
           href="/orders"
           prefetch={true}
@@ -112,6 +112,14 @@ export function OrderDetailContent({
         >
           <ChevronLeft className="h-4 w-4" />
           К заказам
+        </Link>
+        <Link
+          href={`/orders/${order.id}/chat`}
+          prefetch={true}
+          className="inline-flex items-center gap-1.5 rounded-3xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1 md:hidden"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Чат
         </Link>
       </div>
 
@@ -264,38 +272,30 @@ export function OrderDetailContent({
           </div>
         )}
 
-        <div className="pt-2 border-t border-border">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleDelete}
-            disabled={!!actionLoading || isPending}
-            className="rounded-3xl text-muted-foreground hover:text-destructive"
-          >
-            {actionLoading === "delete" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <Trash2 className="h-4 w-4 mr-1" />
-                Удалить из моих заказов
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
-      {/* Mobile: link to full-screen chat */}
-      <div className="md:hidden">
-        <Link
-          href={`/orders/${order.id}/chat`}
-          prefetch={true}
-          className={buttonVariants({ variant: "outline", className: "rounded-3xl w-full" })}
+      {/* Удалить из моих заказов — внизу, красный текст без кнопки */}
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={!!actionLoading || isPending}
+          className="text-sm text-destructive hover:underline disabled:opacity-50 disabled:no-underline"
         >
-          <MessageCircle className="h-4 w-4 mr-2" />
-          Чат
-        </Link>
+          {actionLoading === "delete" ? (
+            <span className="inline-flex items-center gap-1">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Загрузка…
+            </span>
+          ) : isPending ? (
+            <span className="inline-flex items-center gap-1">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Загрузка…
+            </span>
+          ) : (
+            "Удалить из моих заказов"
+          )}
+        </button>
       </div>
     </>
   );
