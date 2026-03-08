@@ -120,6 +120,14 @@ body {
   min-height: 0;
 }
 
+/* Скролл-область для iOS/PWA: плавный скролл и работа жестов */
+.scroll-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 /* Таббар в потоке документа (не fixed), чтобы тачи работали в PWA и мобильном браузере */
 .app-bottom-nav {
   min-height: 3.5rem;

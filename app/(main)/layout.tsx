@@ -49,7 +49,7 @@ export default async function MainLayout({
 
   return (
     <div className="main-app-shell flex h-full min-h-screen flex-col bg-background">
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden lg:flex-row">
+      <div className="scroll-area flex min-h-0 flex-1 flex-col lg:flex-row">
         <Sidebar />
         <div className="lg:pl-56 flex-1">
           <Header profile={profile} />
