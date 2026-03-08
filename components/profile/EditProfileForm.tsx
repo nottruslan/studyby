@@ -64,7 +64,13 @@ export function EditProfileForm({ profile }: { profile: Profile }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 min-h-0"
+      style={{
+        paddingBottom: "max(8rem, calc(5rem + env(safe-area-inset-bottom, 0px)))",
+      }}
+    >
       <div className="flex flex-col items-center gap-3">
         <Avatar className="h-24 w-24 rounded-full border-2 border-border">
           <AvatarImage src={avatarUrl || undefined} alt={username || "Аватар"} />

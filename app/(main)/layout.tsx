@@ -54,7 +54,7 @@ export default async function MainLayout({
         <div className="lg:pl-56 flex-1">
           <Header profile={profile} />
           <main className="px-4 pt-4 pb-4 lg:px-6 lg:pt-6 lg:pb-6">
-            <div className="lg:mx-auto lg:max-w-4xl">{children}</div>
+            <div className="lg:mx-auto lg:max-w-4xl pr-1">{children}</div>
           </main>
         </div>
       </div>

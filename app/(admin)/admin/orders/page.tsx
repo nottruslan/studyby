@@ -9,7 +9,7 @@ export default async function AdminOrdersPage() {
 
   const { data: ordersData } = await admin
     .from("orders")
-    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, originality, plagiarism_system, volume, university, professor")
+    .select("id, student_id, title, subject, work_type, deadline, description, files, status, price, created_at, originality, plagiarism_system, volume, university, professor, deleted_by_student")
     .or("deleted_by_admin.eq.false,deleted_by_admin.is.null")
     .order("created_at", { ascending: false });
 

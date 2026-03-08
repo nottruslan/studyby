@@ -207,7 +207,12 @@ export default function NewOrderPage() {
         ))}
       </div>
 
-      <div className="card-style rounded-3xl p-6 pb-32 space-y-6 border border-slate-200 dark:border-slate-800 min-h-0">
+      <div
+        className="card-style rounded-3xl p-6 space-y-6 border border-slate-200 dark:border-slate-800 min-h-0"
+        style={{
+          paddingBottom: "max(12rem, calc(8rem + env(safe-area-inset-bottom, 0px)))",
+        }}
+      >
         {step === 1 && (
           <>
             <div>
@@ -276,10 +281,11 @@ export default function NewOrderPage() {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="space-y-4 overflow-hidden"
+                  className="overflow-hidden"
                 >
-                  <div>
-                    <Label htmlFor="originality">
+                  <div className="space-y-4 pr-1">
+                    <div>
+                      <Label htmlFor="originality">
                       Требуемая оригинальность (%)
                     </Label>
                     <Input
@@ -336,6 +342,7 @@ export default function NewOrderPage() {
                       </p>
                     )}
                   </div>
+                  </div>
                 </motion.div>
               )}
               {selectedWorkType && isTechWork(selectedWorkType) && (
@@ -347,8 +354,9 @@ export default function NewOrderPage() {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div>
-                    <Label htmlFor="volume-tech">
+                  <div className="pr-1">
+                    <div>
+                      <Label htmlFor="volume-tech">
                       Объём работы / Вариант
                     </Label>
                     <Input
@@ -362,6 +370,7 @@ export default function NewOrderPage() {
                         {errors.volume.message}
                       </p>
                     )}
+                  </div>
                   </div>
                 </motion.div>
               )}

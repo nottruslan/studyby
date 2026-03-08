@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, ExternalLink, Trash2 } from "lucide-react";
+import { Loader2, ExternalLink, Trash2, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import type { OrderWithStudent, OrderStatus } from "@/lib/types/order";
 import { updateOrderAdmin, getOrderFileUrls, deleteOrderByAdmin } from "./actions";
@@ -145,6 +145,16 @@ export function OrderEditSheet({ order, open, onOpenChange, onSuccess }: Props) 
         <SheetHeader>
           <SheetTitle>Редактирование заказа</SheetTitle>
         </SheetHeader>
+
+        {order.deleted_by_student && (
+          <div
+            className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/15 px-3 py-2 text-sm text-amber-800 dark:text-amber-200"
+            role="status"
+          >
+            <EyeOff className="h-4 w-4 shrink-0" />
+            <span>Студент удалил этот заказ из своего списка</span>
+          </div>
+        )}
 
         <div className="flex-1 space-y-4 py-4">
           <div className="space-y-1 text-sm">

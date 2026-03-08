@@ -85,7 +85,13 @@ export function EditOrderForm({ order, deadlineLocal }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card-style rounded-3xl p-6 space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="card-style rounded-3xl p-6 space-y-6 min-h-0"
+      style={{
+        paddingBottom: "max(8rem, calc(5rem + env(safe-area-inset-bottom, 0px)))",
+      }}
+    >
       <div>
         <Label htmlFor="edit-title">Название заказа</Label>
         <Input

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, ExternalLink, Trash2 } from "lucide-react";
+import { ChevronLeft, Loader2, ExternalLink, Trash2, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -164,12 +164,23 @@ export function AdminOrderEditForm({ order }: Props) {
       <div className="flex items-center gap-2">
         <Link
           href="/admin/orders"
+          prefetch={true}
           className="flex items-center gap-1 rounded-3xl p-1 -m-1 text-sm text-muted-foreground hover:text-foreground"
         >
           <ChevronLeft className="h-5 w-5" />
           Назад к заказам
         </Link>
       </div>
+
+      {order.deleted_by_student && (
+        <div
+          className="flex items-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/15 px-4 py-3 text-sm text-amber-800 dark:text-amber-200"
+          role="status"
+        >
+          <EyeOff className="h-4 w-4 shrink-0" />
+          <span>Студент удалил этот заказ из своего списка</span>
+        </div>
+      )}
 
       <h2 className="text-xl font-semibold text-foreground">Редактирование заказа</h2>
 

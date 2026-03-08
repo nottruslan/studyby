@@ -27,6 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OrderWithStudent, OrderStatus } from "@/lib/types/order";
 
@@ -158,6 +159,22 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
         cell: ({ row }) => <StatusBadge status={row.original.status} />,
       },
       {
+        id: "deleted_by_student",
+        header: "Студент",
+        cell: ({ row }) =>
+          row.original.deleted_by_student ? (
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400"
+              title="Студент удалил заказ из своего списка"
+            >
+              <EyeOff className="h-3.5 w-3.5" />
+              Удалил
+            </span>
+          ) : (
+            <span className="text-muted-foreground text-xs">—</span>
+          ),
+      },
+      {
         accessorKey: "price",
         header: "Цена",
         cell: ({ row }) => {
@@ -262,7 +279,18 @@ export function AdminOrdersView({ orders: initialOrders }: Props) {
                   <span className="font-mono text-xs text-muted-foreground">
                     {order.id.slice(0, 8)}…
                   </span>
-                  <StatusBadge status={order.status} />
+                  <div className="flex items-center gap-2">
+                    {order.deleted_by_student && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-400"
+                        title="Студент удалил заказ из своего списка"
+                      >
+                        <EyeOff className="h-3.5 w-3.5" />
+                        Удалил студент
+                      </span>
+                    )}
+                    <StatusBadge status={order.status} />
+                  </div>
                 </div>
                 <p className="font-medium truncate">{order.title}</p>
                 <p className="text-sm text-muted-foreground">
