@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { OrderWithStudent, OrderStatus } from "@/lib/types/order";
-import { updateOrderAdmin, getOrderFileUrls, deleteOrderByAdmin } from "../actions";
+import { updateOrderAdmin, getOrderFileUrls, deleteOrderByAdmin } from "../../actions";
 
 const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: "review", label: "На проверке" },
