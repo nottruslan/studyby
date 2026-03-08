@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+  /* Light: #F8FAFC (Slate-50), cards white, border slate-200. Accent Indigo-500 #6366F1. Success Emerald-500. */
   :root {
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
@@ -10,21 +11,24 @@
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 238 84% 67%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-    --accent: 238 84% 67%;
+    --accent: 239 84% 67%;
     --accent-foreground: 0 0% 100%;
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 238 84% 67%;
+    --ring: 239 84% 67%;
     --radius: 1.5rem;
   }
+  /* Dark: #0F172A (Slate-950), cards bg-slate-900/50 backdrop-blur, border white/10 */
   .dark {
     --background: 222 47% 11%;
     --foreground: 210 40% 98%;
@@ -32,19 +36,21 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
-    --primary: 238 84% 67%;
+    --primary: 239 84% 67%;
     --primary-foreground: 0 0% 100%;
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-    --accent: 238 84% 67%;
+    --accent: 239 84% 67%;
     --accent-foreground: 0 0% 100%;
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
     --destructive: 0 62% 30%;
     --destructive-foreground: 210 40% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 238 84% 67%;
+    --ring: 239 84% 67%;
   }
 }
 
@@ -71,6 +77,15 @@
   .bg-popover { background-color: hsl(var(--popover)); }
   .text-popover-foreground { color: hsl(var(--popover-foreground)); }
   .ring-offset-background { --tw-ring-offset-color: hsl(var(--background)); }
+  .bg-success { background-color: hsl(var(--success)); }
+  .text-success-foreground { color: hsl(var(--success-foreground)); }
+}
+
+/* Card style: light = white + slate-200 border; dark = slate-900/50 + backdrop-blur + white/10 border */
+@layer components {
+  .card-style {
+    @apply bg-white border border-slate-200 dark:bg-slate-900/50 dark:backdrop-blur-md dark:border-white/10;
+  }
 }
 
 /* PWA: фиксированный экран, один скролл-контейнер — без резинки вверх/вниз */
@@ -85,7 +100,7 @@ html {
 body {
   height: 100%;
   overflow: hidden;
-  @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+  @apply bg-[#F8FAFC] text-slate-950 dark:bg-[#0F172A] dark:text-slate-50;
   overscroll-behavior: none;
 }
 
@@ -134,5 +149,3 @@ body {
     min-height: 100dvh;
   }
 }
-
-/* Без scale при нажатии — стабильная картинка в PWA */

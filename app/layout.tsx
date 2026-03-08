@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 import { DisplayModeScript } from "@/components/shared/DisplayModeScript";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
           <div id="app-scroll" className="app-scroll">
             {children}
           </div>
+          <Toaster richColors position="top-center" />
         </ThemeProvider>
       </body>
     </html>
