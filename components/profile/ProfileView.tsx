@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AvatarImageOptimized } from "@/components/ui/avatar-image-optimized";
 import { User, Lock, ChevronRight, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -34,12 +34,20 @@ export function ProfileView({ profile }: { profile: Profile }) {
     <div className="space-y-6">
       {/* Верхний блок: аватар и имя, как в Telegram */}
       <div className="flex flex-col items-center pt-2 pb-4">
-        <Avatar className="h-24 w-24 rounded-full border-2 border-border">
-          <AvatarImage src={profile.avatar_url ?? undefined} alt={profile.username ?? "Аватар"} />
-          <AvatarFallback className="rounded-full bg-primary/20 text-3xl text-primary">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-2 border-border">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-primary/20 text-3xl text-primary">
             {(profile.username ?? "U").slice(0, 1).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+          </div>
+          {profile.avatar_url && (
+            <AvatarImageOptimized
+              src={profile.avatar_url}
+              alt={profile.username ?? "Аватар"}
+              size={96}
+              priority
+              className="absolute inset-0 h-full w-full rounded-full"
+            />
+          )}
+        </div>
         <p className="mt-3 text-xl font-semibold">{profile.username ?? "—"}</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Вуз: {profile.university ?? "—"} · Баланс: {profile.balance}
@@ -50,6 +58,7 @@ export function ProfileView({ profile }: { profile: Profile }) {
       <div className="overflow-hidden rounded-2xl bg-card border border-border">
         <Link
           href="/profile/edit"
+          prefetch={true}
           className={rowClass}
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
@@ -60,6 +69,7 @@ export function ProfileView({ profile }: { profile: Profile }) {
         </Link>
         <Link
           href="/profile/confidentiality"
+          prefetch={true}
           className={`${rowClass} border-t border-border`}
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
@@ -71,6 +81,7 @@ export function ProfileView({ profile }: { profile: Profile }) {
         {profile.role === "admin" && (
           <Link
             href="/admin/orders"
+            prefetch={true}
             className={`${rowClass} border-t border-border`}
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">

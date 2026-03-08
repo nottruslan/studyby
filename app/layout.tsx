@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 import { DisplayModeScript } from "@/components/shared/DisplayModeScript";
+import { fontSans } from "@/lib/fonts";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -29,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={fontSans.variable}>
       <head>
         <DisplayModeScript />
         <meta name="apple-mobile-web-app-capable" content="yes" />

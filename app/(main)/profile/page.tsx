@@ -1,25 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { ProfileView } from "@/components/profile/ProfileView";
+import { Suspense } from "react";
+import { ProfileData } from "./ProfileData";
+import { ProfileSkeleton } from "@/components/skeletons/ProfileSkeleton";
 
-export default async function ProfilePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/onboarding");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) redirect("/feed");
-
+export default function ProfilePage() {
   return (
-    <div className="space-y-2">
-      <ProfileView profile={profile} />
-    </div>
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileData />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -26,6 +26,7 @@ function getMinDatetimeLocal(): string {
 
 export default function NewOrderPage() {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Partial<OrderFormValues>>({
@@ -142,8 +143,10 @@ export default function NewOrderPage() {
         }
       }
       toast.success("Заказ создан и отправлен на проверку");
-      router.push("/orders");
-      router.refresh();
+      startTransition(() => {
+        router.push("/orders");
+        router.refresh();
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Ошибка создания заказа";
       toast.error(msg);
@@ -320,10 +323,10 @@ export default function NewOrderPage() {
               <Button
                 type="button"
                 className="rounded-3xl"
-                disabled={loading}
+                disabled={loading || isPending}
                 onClick={handleSubmit}
               >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Создать заказ"}
+                {loading || isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Создать заказ"}
               </Button>
             </div>
           </>
