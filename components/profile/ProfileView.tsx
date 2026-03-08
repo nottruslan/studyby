@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { EditProfileDialog } from "./EditProfileDialog";
 import { User, Lock, ChevronRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -48,18 +47,16 @@ export function ProfileView({ profile }: { profile: Profile }) {
 
       {/* Карточка пунктов, как в Telegram */}
       <div className="overflow-hidden rounded-2xl bg-card border border-border">
-        <EditProfileDialog
-          profile={profile}
-          trigger={
-            <button type="button" className={rowClass}>
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
-                <User className="h-5 w-5" />
-              </div>
-              <span className="flex-1 font-medium">Редактировать профиль</span>
-              <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
-            </button>
-          }
-        />
+        <Link
+          href="/profile/edit"
+          className={rowClass}
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary">
+            <User className="h-5 w-5" />
+          </div>
+          <span className="flex-1 font-medium">Редактировать профиль</span>
+          <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
+        </Link>
         <Link
           href="/profile/confidentiality"
           className={`${rowClass} border-t border-border`}
