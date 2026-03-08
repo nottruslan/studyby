@@ -129,7 +129,16 @@ export function OrdersListClient({ orders, loadError }: Props) {
             }
           />
         ) : (
-          <ul className="space-y-3">
+          <div className="space-y-3">
+            <Link
+              href="/orders/new"
+              prefetch={true}
+              className="inline-flex items-center justify-center rounded-3xl h-10 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Создать заказ
+            </Link>
+            <ul className="space-y-3">
             {activeOrders.map((order) => (
               <li key={order.id}>
                 <Link
@@ -156,7 +165,8 @@ export function OrdersListClient({ orders, loadError }: Props) {
                 </Link>
               </li>
             ))}
-          </ul>
+            </ul>
+          </div>
         )
       ) : historyOrders.length === 0 ? (
         <EmptyState
