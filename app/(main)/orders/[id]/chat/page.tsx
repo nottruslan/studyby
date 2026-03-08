@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getInitialMessages } from "../actions";
 import { OrderChatArea } from "../components/chat/OrderChatArea";
+import { ChatFullscreenShell } from "../components/chat/ChatFullscreenShell";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -43,19 +44,17 @@ export default async function OrderChatPage({ params }: Props) {
   const studentUsername = studentProfile?.username ?? null;
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full bg-background pt-[env(safe-area-inset-top)] overflow-hidden">
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <OrderChatArea
-          orderId={id}
-          currentUserId={user.id}
-          initialMessages={initialMessages}
-          studentUsername={studentUsername}
-          isCurrentUserAdmin={isAdmin}
-          fullScreen={true}
-          backHref={`/orders/${id}`}
-          backLabel="К заказу"
-        />
-      </div>
-    </div>
+    <ChatFullscreenShell>
+      <OrderChatArea
+        orderId={id}
+        currentUserId={user.id}
+        initialMessages={initialMessages}
+        studentUsername={studentUsername}
+        isCurrentUserAdmin={isAdmin}
+        fullScreen={true}
+        backHref={`/orders/${id}`}
+        backLabel="К заказу"
+      />
+    </ChatFullscreenShell>
   );
 }

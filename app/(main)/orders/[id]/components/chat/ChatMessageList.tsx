@@ -84,7 +84,11 @@ export function ChatMessageList({
         "flex-1 min-h-0 overflow-y-auto chat-message-list-scroll",
         className
       )}
-      style={{ overscrollBehaviorY: "none" }}
+      style={{
+        overscrollBehavior: "none",
+        minHeight: 0,
+        WebkitOverflowScrolling: "touch",
+      }}
       onScroll={handleScroll}
     >
       {hasOlder && (
