@@ -48,15 +48,17 @@ export default async function MainLayout({
   }
 
   return (
-    <div className="main-app-shell min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))] lg:pb-0">
-      <Sidebar />
-      <div className="lg:pl-56">
-        <Header profile={profile} />
-        <main className="px-4 pt-4 lg:px-6 lg:pt-6">
-          <div className="lg:mx-auto lg:max-w-4xl">{children}</div>
-        </main>
+    <div className="main-app-shell flex h-full min-h-screen flex-col bg-background">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden lg:flex-row">
+        <Sidebar />
+        <div className="lg:pl-56 flex-1">
+          <Header profile={profile} />
+          <main className="px-4 pt-4 pb-4 lg:px-6 lg:pt-6 lg:pb-6">
+            <div className="lg:mx-auto lg:max-w-4xl">{children}</div>
+          </main>
+        </div>
       </div>
-      <div className="lg:hidden">
+      <div className="lg:hidden flex-shrink-0 border-t border-border bg-background">
         <BottomNavigationBar />
       </div>
     </div>

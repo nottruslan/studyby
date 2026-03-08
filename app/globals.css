@@ -104,42 +104,34 @@ body {
   overscroll-behavior: none;
 }
 
-/* Единственная прокручиваемая область — без overscroll (резинки) */
+/* Контейнер на всю высоту; скролл внутри (main) layout, таббар вне скролла — иначе на iOS тачи не доходят до fixed-таббара */
 .app-scroll {
   height: 100%;
   min-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
   background-color: hsl(var(--background));
 }
 
-/* PWA: таббар у самого низа, по гайдам — bottom = safe-area, без лишнего отступа */
-[data-display-mode="standalone"] .app-bottom-nav {
-  bottom: env(safe-area-inset-bottom);
-  padding-bottom: 0.5rem;
+.app-scroll > * {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+/* Таббар в потоке документа (не fixed), чтобы тачи работали в PWA и мобильном браузере */
+.app-bottom-nav {
   min-height: 3.5rem;
+  -webkit-tap-highlight-color: transparent;
 }
 
-[data-display-mode="standalone"] .main-app-shell {
-  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
-}
-
-/* Браузер на телефоне: отступы под панель Safari */
-[data-display-mode="browser"] .main-app-shell {
-  padding-bottom: calc(5rem + env(safe-area-inset-bottom) + 5rem);
+[data-display-mode="standalone"] .app-bottom-nav {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
 [data-display-mode="browser"] .app-bottom-nav {
-  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom) + 3.5rem);
-}
-
-/* Десктоп (lg+): таббар скрыт, нижний отступ не нужен */
-@media (min-width: 1024px) {
-  [data-display-mode="browser"] .main-app-shell {
-    padding-bottom: 0;
-  }
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
 
 @layer utilities {
