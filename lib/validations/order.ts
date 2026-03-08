@@ -12,9 +12,7 @@ const workTypes = [
 export const orderFormSchema = z.object({
   title: z.string().min(1, "Введите название заказа").max(200),
   subject: z.string().min(1, "Укажите предмет").max(100),
-  work_type: z.enum(workTypes, {
-    required_error: "Выберите тип работы",
-  }),
+  work_type: z.enum(workTypes, { message: "Выберите тип работы" }),
   deadline: z.string().min(1, "Укажите срок").refine(
     (s) => new Date(s) > new Date(),
     "Срок должен быть в будущем"

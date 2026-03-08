@@ -51,10 +51,11 @@ export default function NewOrderPage() {
     if (s === 1) {
       const r = orderFormSchema.pick({ title: true, subject: true, work_type: true }).safeParse(form);
       if (!r.success) {
+        const flat = r.error.flatten().fieldErrors;
         const e: Partial<Record<keyof OrderFormValues, string>> = {};
-        r.error.flatten().fieldErrors?.title?.[0] && (e.title = r.error.flatten().fieldErrors.title[0]);
-        r.error.flatten().fieldErrors?.subject?.[0] && (e.subject = r.error.flatten().fieldErrors.subject[0]);
-        r.error.flatten().fieldErrors?.work_type?.[0] && (e.work_type = r.error.flatten().fieldErrors.work_type[0]);
+        const t = flat?.title?.[0]; if (t) e.title = t;
+        const sub = flat?.subject?.[0]; if (sub) e.subject = sub;
+        const wt = flat?.work_type?.[0]; if (wt) e.work_type = wt;
         setErrors((prev) => ({ ...prev, ...e }));
         return false;
       }
@@ -62,8 +63,8 @@ export default function NewOrderPage() {
     if (s === 2) {
       const r = orderFormSchema.pick({ deadline: true }).safeParse(form);
       if (!r.success) {
-        const msg = r.error.flatten().fieldErrors?.deadline?.[0];
-        setErrors((prev) => ({ ...prev, deadline: msg || "Укажите срок" }));
+        const msg = r.error.flatten().fieldErrors?.deadline?.[0] ?? "Укажите срок";
+        setErrors((prev) => ({ ...prev, deadline: msg }));
         return false;
       }
     }
@@ -170,12 +171,13 @@ export default function NewOrderPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="sm" className="rounded-3xl -m-1">
-          <Link href="/orders" className="flex items-center gap-1 text-muted-foreground hover:text-foreground">
-            <ChevronLeft className="h-5 w-5" />
-            Назад
-          </Link>
-        </Button>
+        <Link
+          href="/orders"
+          className="inline-flex items-center gap-1 rounded-3xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground -m-1"
+        >
+          <ChevronLeft className="h-5 w-5" />
+          Назад
+        </Link>
       </div>
       <h2 className="text-xl font-semibold text-foreground">Новый заказ</h2>
 

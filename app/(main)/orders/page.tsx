@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import {
   ClipboardList,
   Plus,
@@ -141,12 +140,13 @@ export default function OrdersPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold text-foreground">Биржа заказов</h2>
-        <Button asChild className="rounded-3xl" size="sm">
-          <Link href="/orders/new">
-            <Plus className="h-4 w-4 mr-2" />
-            Создать заказ
-          </Link>
-        </Button>
+        <Link
+          href="/orders/new"
+          className="inline-flex items-center justify-center rounded-3xl h-9 px-3 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Создать заказ
+        </Link>
       </div>
 
       <div className="flex gap-1 p-1 rounded-3xl bg-muted w-fit">
@@ -187,12 +187,13 @@ export default function OrdersPage() {
             title="Пока нет активных заказов"
             description="Создайте заказ — модератор назначит цену, после чего можно будет оплатить и начать работу."
             action={
-              <Button asChild className="rounded-3xl">
-                <Link href="/orders/new">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Создать заказ
-                </Link>
-              </Button>
+              <Link
+                href="/orders/new"
+                className="inline-flex items-center justify-center rounded-3xl h-10 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Создать заказ
+              </Link>
             }
           />
         ) : (
@@ -230,9 +231,12 @@ export default function OrdersPage() {
           title="История пуста"
           description="Здесь появятся выполненные и отменённые заказы."
           action={
-            <Button asChild variant="outline" className="rounded-3xl">
-              <Link href="/orders/new">Создать заказ</Link>
-            </Button>
+            <Link
+              href="/orders/new"
+              className="inline-flex items-center justify-center rounded-3xl h-10 px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+            >
+              Создать заказ
+            </Link>
           }
         />
       ) : (
