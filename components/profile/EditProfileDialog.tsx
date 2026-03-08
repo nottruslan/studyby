@@ -17,7 +17,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { createClient } from "@/lib/supabase/client";
 import type { Profile } from "./ProfileView";
 
-export function EditProfileDialog({ profile }: { profile: Profile }) {
+type EditProfileDialogProps = {
+  profile: Profile;
+  trigger?: React.ReactNode;
+};
+
+export function EditProfileDialog({ profile, trigger }: EditProfileDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [username, setUsername] = useState(profile.username ?? "");
@@ -79,9 +84,11 @@ export function EditProfileDialog({ profile }: { profile: Profile }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="rounded-3xl">
-          Редактировать
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" size="sm" className="rounded-3xl">
+            Редактировать
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="rounded-3xl">
         <DialogHeader>

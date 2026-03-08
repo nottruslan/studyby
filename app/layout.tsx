@@ -36,7 +36,9 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <div id="app-scroll" className="app-scroll">
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>

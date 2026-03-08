@@ -35,7 +35,7 @@ export default async function MainLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-[calc(5rem+env(safe-area-inset-bottom))]">
       <Header />
       <main className="px-4 pt-4">{children}</main>
       <BottomNavigationBar />

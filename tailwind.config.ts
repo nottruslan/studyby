@@ -13,6 +13,12 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
       },
+      transitionDuration: {
+        DEFAULT: "100ms",
+      },
+      animationDuration: {
+        DEFAULT: "100ms",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

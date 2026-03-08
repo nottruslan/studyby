@@ -73,15 +73,31 @@
   .ring-offset-background { --tw-ring-offset-color: hsl(var(--background)); }
 }
 
+/* PWA: фиксированный экран, один скролл-контейнер — без резинки вверх/вниз */
 html {
-  overflow-x: hidden;
+  height: 100%;
+  overflow: hidden;
   -webkit-text-size-adjust: 100%;
+  /* Фон до самого верха на iPhone (safe area) */
+  background-color: hsl(var(--background));
 }
 
 body {
+  height: 100%;
+  overflow: hidden;
   @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+  overscroll-behavior: none;
+}
+
+/* Единственная прокручиваемая область — без overscroll (резинки) */
+.app-scroll {
+  height: 100%;
+  min-height: 100%;
+  overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  background-color: hsl(var(--background));
 }
 
 @layer utilities {

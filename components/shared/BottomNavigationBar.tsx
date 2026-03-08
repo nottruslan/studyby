@@ -22,7 +22,7 @@ export function BottomNavigationBar() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background py-2"
+      className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-border bg-background py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
       role="navigation"
     >
       {items.map(({ href, icon: Icon, label }) => {
@@ -31,6 +31,8 @@ export function BottomNavigationBar() {
           <Link
             key={href}
             href={href}
+            scroll={false}
+            prefetch={true}
             className={cn(
               "flex flex-col items-center gap-1 rounded-3xl px-4 py-2 text-sm transition-colors ",
               isActive
