@@ -26,13 +26,13 @@ export function BottomNavigationBar() {
       role="navigation"
     >
       {items.map(({ href, icon: Icon, label }) => {
-        const isActive = pathname === href;
+        const isActive = href === "/profile" ? pathname.startsWith("/profile") : pathname === href;
         return (
           <Link
             key={href}
             href={href}
             className={cn(
-              "flex flex-col items-center gap-1 rounded-3xl px-4 py-2 text-sm transition-colors active:scale-95",
+              "flex flex-col items-center gap-1 rounded-3xl px-4 py-2 text-sm transition-colors ",
               isActive
                 ? "text-primary"
                 : "text-muted-foreground hover:text-foreground"

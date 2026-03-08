@@ -73,11 +73,23 @@
   .ring-offset-background { --tw-ring-offset-color: hsl(var(--background)); }
 }
 
-body {
-  @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Clickable scale */
-[data-clickable] {
-  @apply active:scale-95 transition-transform;
+body {
+  @apply bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50;
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
+
+@layer utilities {
+  /* Стабильная высота экрана в PWA и мобильных — без скачка при скрытии адресной строки */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
+/* Без scale при нажатии — стабильная картинка в PWA */

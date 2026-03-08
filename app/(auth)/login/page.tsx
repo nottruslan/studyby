@@ -99,7 +99,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setTab("code")}
-            className={`flex-1 rounded-3xl py-2 text-sm font-medium transition-colors active:scale-95 ${
+            className={`flex-1 rounded-3xl py-2 text-sm font-medium transition-colors ${
               tab === "code"
                 ? "bg-background text-foreground shadow"
                 : "text-muted-foreground"
@@ -110,7 +110,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setTab("password")}
-            className={`flex-1 rounded-3xl py-2 text-sm font-medium transition-colors active:scale-95 ${
+            className={`flex-1 rounded-3xl py-2 text-sm font-medium transition-colors ${
               tab === "password"
                 ? "bg-background text-foreground shadow"
                 : "text-muted-foreground"

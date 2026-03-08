@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,12 +40,8 @@ export default function OnboardingPage() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [emailAlreadyRegistered, setEmailAlreadyRegistered] = useState(false);
 
-  const resetFormState = () => {
-    setError(null);
-    setEmailAlreadyRegistered(false);
-  };
+  const resetFormState = () => setError(null);
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +50,7 @@ export default function OnboardingPage() {
     try {
       const exists = await checkEmailExists(email.trim());
       if (exists) {
-        setEmailAlreadyRegistered(true);
+        setTab("login");
         setLoading(false);
         return;
       }
@@ -134,21 +128,13 @@ export default function OnboardingPage() {
       {/* Левая колонка — слайды */}
       <section className="flex-1 flex flex-col justify-center px-6 py-10 lg:py-16 lg:pl-16 lg:pr-12 border-b lg:border-b-0 lg:border-r border-border/50">
         <div className="w-full max-w-md mx-auto lg:max-w-lg">
-          <div className="overflow-hidden">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.25 }}
-              className="min-w-full"
-            >
-              <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
-                {SLIDES[step].title}
-              </h2>
-              <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">
-                {SLIDES[step].text}
-              </p>
-            </motion.div>
+          <div className="overflow-hidden min-w-full">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-3">
+              {SLIDES[step].title}
+            </h2>
+            <p className="text-muted-foreground text-base lg:text-lg leading-relaxed">
+              {SLIDES[step].text}
+            </p>
           </div>
           <div className="flex items-center gap-3 mt-8">
             <div className="flex gap-1.5">
@@ -242,14 +228,6 @@ export default function OnboardingPage() {
                   className="mt-1.5 rounded-3xl"
                 />
               </div>
-              {emailAlreadyRegistered && (
-                <p className="text-sm text-amber-600 dark:text-amber-400" role="alert">
-                  Такая почта уже зарегистрирована.{" "}
-                  <Link href="/login" className="underline hover:no-underline">
-                    Войдите через неё
-                  </Link>
-                </p>
-              )}
               {error && (
                 <p className="text-sm text-red-600 dark:text-red-400" role="alert">
                   {error}
