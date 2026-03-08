@@ -1,3 +1,4 @@
+import { unstable_noStore } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { OrderWithStudent } from "@/lib/types/order";
 import { AdminOrdersView } from "./AdminOrdersView";
@@ -5,6 +6,7 @@ import { AdminOrdersView } from "./AdminOrdersView";
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage() {
+  unstable_noStore();
   const admin = createAdminClient();
 
   const { data: ordersData } = await admin
