@@ -86,6 +86,9 @@
   .card-style {
     @apply bg-white border border-slate-200 dark:bg-slate-900/50 dark:backdrop-blur-md dark:border-white/10;
   }
+  .active-press {
+    @apply active:scale-[0.98] transition-transform duration-200 ease-out;
+  }
 }
 
 /* PWA: фиксированный экран, один скролл-контейнер — без резинки вверх/вниз */
